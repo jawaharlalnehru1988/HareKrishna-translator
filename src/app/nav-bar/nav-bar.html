@@ -1,0 +1,27 @@
+<nav class="navbar glass-morphism">
+    <div class="nav-container">
+        <div class="logo">
+            <div class="logo-icon divine-gradient">
+                <span class="om-symbol">ॐ</span>
+            </div>
+            <div class="logo-text">
+                <span class="brand-name">Hare Krishna</span>
+                <span class="brand-sub">Translator</span>
+            </div>
+        </div>
+
+        <div class="nav-links" [class.active]="isMenuOpen">
+            <a routerLink="/home" class="nav-link" routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: true}">Home</a>
+            <a routerLink="/history" class="nav-link" routerLinkActive="active">History</a>
+            <a routerLink="/corrector" class="nav-link" routerLinkActive="active">Corrector</a>
+            <button class="primary-btn login-btn">Login</button>
+        </div>
+
+        <div class="mobile-toggle" (click)="toggleMenu()">
+            <div class="bar" [class.open]="isMenuOpen"></div>
+            <div class="bar" [class.open]="isMenuOpen"></div>
+            <div class="bar" [class.open]="isMenuOpen"></div>
+        </div>
+    </div>
+</nav>
