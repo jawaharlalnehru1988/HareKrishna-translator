@@ -16,6 +16,7 @@ export class TranslationCorrector {
   correctedText: string = '';
   isProcessing: boolean = false;
   isCorrected: boolean = false;
+  isCopied: boolean = false;
   errorMessage: string = '';
 
   constructor(private translationService: TranslationService) {}
@@ -59,6 +60,15 @@ export class TranslationCorrector {
         this.errorMessage = 'Failed to save correction.';
         this.isProcessing = false;
       }
+    });
+  }
+
+  onCopy() {
+    if (!this.correctedText) return;
+    
+    navigator.clipboard.writeText(this.correctedText).then(() => {
+      this.isCopied = true;
+      setTimeout(() => this.isCopied = false, 2000);
     });
   }
 

@@ -25,8 +25,11 @@
           class="primary-btn" 
           [disabled]="isProcessing || !sourceText.trim()"
         >
-          <span *ngIf="!isProcessing">Translate</span>
-          <span *ngIf="isProcessing" class="loader"></span>
+          @if (!isProcessing) {
+            <span>Translate</span>
+          } @else {
+            <span class="loader"></span>
+          }
         </button>
       </div>
     </div>
@@ -38,37 +41,51 @@
         <h3 class="card-title">Corrector Workspace</h3>
       </div>
       <div class="card-body">
-        <div *ngIf="!currentTranslation && !isProcessing" class="empty-state">
-          <div class="empty-icon">🕊️</div>
-          <p>Enter text on the left to begin the divine translation process.</p>
-        </div>
+        @if (!currentTranslation && !isProcessing) {
+          <div class="empty-state">
+            <div class="empty-icon">🕊️</div>
+            <p>Enter text on the left to begin the divine translation process.</p>
+          </div>
+        }
         
-        <textarea 
-          *ngIf="currentTranslation || isProcessing"
-          [(ngModel)]="correctedText" 
-          class="text-input tamil-text" 
-          placeholder="Translation will appear here..."
-          [disabled]="isProcessing || !currentTranslation"
-        ></textarea>
+        @if (currentTranslation || isProcessing) {
+          <textarea 
+            [(ngModel)]="correctedText" 
+            class="text-input tamil-text" 
+            placeholder="Translation will appear here..."
+            [disabled]="isProcessing || !currentTranslation"
+          ></textarea>
+        }
       </div>
-      <div class="card-footer" *ngIf="currentTranslation">
-        <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing">Reset</button>
-        <button (click)="onSaveCorrection(true)" class="primary-btn" [disabled]="isProcessing">
-          <span>Approve & Save</span>
-        </button>
-      </div>
+      @if (currentTranslation) {
+        <div class="card-footer">
+          <button (click)="onCopy()" class="secondary-btn copy-btn" [disabled]="isProcessing">
+            <span *ngIf="!isCopied">Copy Text</span>
+            <span *ngIf="isCopied">Copied!</span>
+          </button>
+          <div class="spacer"></div>
+          <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing">Reset</button>
+          <button (click)="onSaveCorrection(true)" class="primary-btn" [disabled]="isProcessing">
+            <span>Approve & Save</span>
+          </button>
+        </div>
+      }
     </div>
   </div>
 
-  <div *ngIf="errorMessage" class="error-banner animate-fade-in">
-    {{ errorMessage }}
-  </div>
-
-  <div *ngIf="isCorrected" class="feedback-toast glass-morphism animate-fade-in">
-    <div class="toast-icon">✨</div>
-    <div class="toast-content">
-      <h4>Correction Saved</h4>
-      <p>The translation has been updated and archived.</p>
+  @if (errorMessage) {
+    <div class="error-banner animate-fade-in">
+      {{ errorMessage }}
     </div>
-  </div>
+  }
+
+  @if (isCorrected) {
+    <div class="feedback-toast glass-morphism animate-fade-in">
+      <div class="toast-icon">✨</div>
+      <div class="toast-content">
+        <h4>Correction Saved</h4>
+        <p>The translation has been updated and archived.</p>
+      </div>
+    </div>
+  }
 </div>

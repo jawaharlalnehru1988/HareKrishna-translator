@@ -4,35 +4,39 @@
     <p class="subtitle">A divine archive of all your translations and corrections.</p>
   </header>
 
-  <div *ngIf="isLoading" class="loading-state">
-    <div class="loader"></div>
-    <p>Retrieving your spiritual records...</p>
-  </div>
-
-  <div *ngIf="!isLoading && translations.length === 0" class="empty-state">
-    <div class="empty-icon">📜</div>
-    <h3>No records found</h3>
-    <p>Start translating on the Corrector page to build your history.</p>
-  </div>
-
-  <div *ngIf="!isLoading && translations.length > 0" class="history-grid">
-    <div *ngFor="let item of translations" class="history-card premium-card">
-      <div class="card-header">
-        <span class="date">{{ item.createdAt | date:'medium' }}</span>
-        <span class="status" [class.approved]="item.approved">
-          {{ item.approved ? 'Approved' : 'Pending' }}
-        </span>
-      </div>
-      <div class="card-body">
-        <div class="text-group">
-          <label>Original</label>
-          <p>{{ item.sourceText }}</p>
-        </div>
-        <div class="text-group">
-          <label>Final Translation</label>
-          <p class="tamil-text">{{ item.correctedText || item.translatedText }}</p>
-        </div>
-      </div>
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loader"></div>
+      <p>Retrieving your spiritual records...</p>
     </div>
-  </div>
+  } @else if (translations.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📜</div>
+      <h3>No records found</h3>
+      <p>Start translating on the Corrector page to build your history.</p>
+    </div>
+  } @else {
+    <div class="history-grid">
+      @for (item of translations; track item.id) {
+        <div class="history-card premium-card">
+          <div class="card-header">
+            <span class="date">{{ item.createdAt | date:'medium' }}</span>
+            <span class="status" [class.approved]="item.approved">
+              {{ item.approved ? 'Approved' : 'Pending' }}
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="text-group">
+              <label>Original</label>
+              <p>{{ item.sourceText }}</p>
+            </div>
+            <div class="text-group">
+              <label>Final Translation</label>
+              <p class="tamil-text">{{ item.correctedText || item.translatedText }}</p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

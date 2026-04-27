@@ -127,7 +127,22 @@
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 15px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.copy-btn {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+  border-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+  
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
+  }
 }
 
 .secondary-btn {
