@@ -1,32 +1,61 @@
 <div class="corrector-container">
   <header class="corrector-header">
-    <h1 class="title">Translation Corrector</h1>
-    <p class="subtitle">Refine and perfect divine translations with AI-assisted corrections.</p>
+    <h1 class="title">Translation Evaluator</h1>
+    <p class="subtitle">Evaluate and refine manual translations with divine AI-assisted feedback.</p>
   </header>
 
   <div class="workspace">
-    <!-- Source Section -->
+    <!-- 1. Source Card (Full Width Top) -->
     <div class="card premium-card source-card">
       <div class="card-header">
         <span class="lang-tag">Source Text</span>
-        <h3 class="card-title">Divine Source</h3>
+        <h3 class="card-title">Original English Text</h3>
       </div>
       <div class="card-body">
         <textarea 
-          [(ngModel)]="sourceText" 
+          id="englishText"
+          [ngModel]="englishText()"
+          (ngModelChange)="englishText.set($event)"
           class="text-input" 
-          placeholder="Enter English or Sanskrit text to translate..."
-          [disabled]="isProcessing"
+          rows="10"
+          placeholder="Enter the original English text..."
+          [disabled]="isProcessing()"
         ></textarea>
+        <div class="char-counter" [class.limit-reached]="englishText().length > maxChars">
+          {{ englishText().length }} / {{ maxChars }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Manual Translation Card (Left Middle) -->
+    <div class="card premium-card manual-card">
+      <div class="card-header">
+        <span class="lang-tag">Your Draft</span>
+        <h3 class="card-title">Your Tamil Translation</h3>
+      </div>
+      <div class="card-body">
+        <textarea 
+          id="tamilTranslation"
+          [ngModel]="tamilTranslation()"
+          (ngModelChange)="tamilTranslation.set($event)"
+          class="text-input tamil-text" 
+          rows="15"
+          placeholder="Enter your Tamil translation for evaluation..."
+          [disabled]="isProcessing()"
+        ></textarea>
+        <div class="char-counter" [class.limit-reached]="tamilTranslation().length > maxChars">
+          {{ tamilTranslation().length }} / {{ maxChars }}
+        </div>
       </div>
       <div class="card-footer">
+        <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing()">Clear All</button>
         <button 
-          (click)="onTranslate()" 
+          (click)="onEvaluate()" 
           class="primary-btn" 
-          [disabled]="isProcessing || !sourceText.trim()"
+          [disabled]="isProcessing() || !englishText().trim() || !tamilTranslation().trim() || englishText().length > maxChars || tamilTranslation().length > maxChars"
         >
-          @if (!isProcessing) {
-            <span>Translate</span>
+          @if (!isProcessing()) {
+            <span>Evaluate</span>
           } @else {
             <span class="loader"></span>
           }
@@ -34,58 +63,69 @@
       </div>
     </div>
 
-    <!-- Result/Correction Section -->
-    <div class="card premium-card translation-card" [class.empty]="!currentTranslation">
+    <!-- 3. Improved Translation Card (Right Middle) -->
+    <div class="card premium-card improved-card" [class.empty]="!evaluationResult() && !isProcessing()">
       <div class="card-header">
-        <span class="lang-tag">Tamil Translation</span>
-        <h3 class="card-title">Corrector Workspace</h3>
+        <span class="lang-tag">AI Improvement</span>
+        <h3 class="card-title">Improved Translation</h3>
       </div>
       <div class="card-body">
-        @if (!currentTranslation && !isProcessing) {
+        @if (isProcessing()) {
           <div class="empty-state">
-            <div class="empty-icon">🕊️</div>
-            <p>Enter text on the left to begin the divine translation process.</p>
+            <div class="loader-divine"></div>
+            <p>The divine AI is refining your translation...</p>
           </div>
-        }
-        
-        @if (currentTranslation || isProcessing) {
+        } @else if (!evaluationResult()) {
+          <div class="empty-state">
+            <div class="empty-icon">✨</div>
+            <p>The improved version will appear here after evaluation.</p>
+          </div>
+        } @else {
           <textarea 
-            [(ngModel)]="correctedText" 
+            [ngModel]="evaluationResult()?.improvedTranslation" 
+            readonly
             class="text-input tamil-text" 
-            placeholder="Translation will appear here..."
-            [disabled]="isProcessing || !currentTranslation"
+            rows="15"
+            style="background: color-mix(in srgb, var(--primary) 2%, transparent); padding: 15px; border-radius: 12px; border: 1px solid var(--primary-light);"
           ></textarea>
         }
       </div>
-      @if (currentTranslation) {
+      @if (evaluationResult()) {
         <div class="card-footer">
-          <button (click)="onCopy()" class="secondary-btn copy-btn" [disabled]="isProcessing">
-            <span *ngIf="!isCopied">Copy Text</span>
-            <span *ngIf="isCopied">Copied!</span>
-          </button>
-          <div class="spacer"></div>
-          <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing">Reset</button>
-          <button (click)="onSaveCorrection(true)" class="primary-btn" [disabled]="isProcessing">
-            <span>Approve & Save</span>
+          <button (click)="onCopyImproved()" class="secondary-btn copy-btn" [disabled]="isProcessing()">
+            @if (!isCopied()) {
+              <span>Copy Improved Text</span>
+            } @else {
+              <span>Copied!</span>
+            }
           </button>
         </div>
       }
     </div>
+
+    <!-- 4. Feedback Card (Full Width Bottom) -->
+    @if (evaluationResult() || isProcessing()) {
+      <div class="card premium-card feedback-card animate-fade-in">
+        <div class="card-header">
+          <span class="lang-tag">Feedback</span>
+          <h3 class="card-title">Suggestions & Word Choice</h3>
+        </div>
+        <div class="card-body">
+          @if (isProcessing()) {
+            <p>Generating feedback...</p>
+          } @else if (evaluationResult(); as result) {
+            <div class="feedback-box" style="padding: 20px; background: #fdfdfd; border-radius: 12px; border-left: 4px solid var(--primary); color: var(--text-main); font-size: 1.05rem; line-height: 1.8;">
+              <markdown [data]="result.suggestions"></markdown>
+            </div>
+          }
+        </div>
+      </div>
+    }
   </div>
 
-  @if (errorMessage) {
+  @if (errorMessage()) {
     <div class="error-banner animate-fade-in">
-      {{ errorMessage }}
-    </div>
-  }
-
-  @if (isCorrected) {
-    <div class="feedback-toast glass-morphism animate-fade-in">
-      <div class="toast-icon">✨</div>
-      <div class="toast-content">
-        <h4>Correction Saved</h4>
-        <p>The translation has been updated and archived.</p>
-      </div>
+      {{ errorMessage() }}
     </div>
   }
 </div>

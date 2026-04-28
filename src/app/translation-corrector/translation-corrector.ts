@@ -1,78 +1,95 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslationService, Translation } from '../services/translation.service';
+import { MarkdownComponent } from 'ngx-markdown';
+import { EvaluationService, EvaluationResponse } from '../services/evaluation.service';
+import { firstValueFrom, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-translation-corrector',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MarkdownComponent],
   templateUrl: './translation-corrector.html',
   styleUrl: './translation-corrector.scss',
 })
-export class TranslationCorrector {
-  sourceText: string = '';
-  currentTranslation: Translation | null = null;
-  correctedText: string = '';
-  isProcessing: boolean = false;
-  isCorrected: boolean = false;
-  isCopied: boolean = false;
-  errorMessage: string = '';
+export class TranslationCorrector implements OnInit, OnDestroy {
+  englishText = signal('');
+  tamilTranslation = signal('');
+  evaluationResult = signal<EvaluationResponse | null>(null);
+  isProcessing = signal(false);
+  isCopied = signal(false);
+  errorMessage = signal('');
+  readonly maxChars = 3000;
+  
+  private destroy$ = new Subject<void>();
 
-  constructor(private translationService: TranslationService) {}
+  constructor(
+    private evaluationService: EvaluationService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  onTranslate() {
-    if (!this.sourceText.trim()) return;
-    
-    this.isProcessing = true;
-    this.errorMessage = '';
-    this.currentTranslation = null;
-    
-    this.translationService.translate(this.sourceText).subscribe({
-      next: (res) => {
-        this.currentTranslation = res;
-        this.correctedText = res.translatedText || '';
-        this.isProcessing = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to translate. Please check if the backend is running.';
-        this.isProcessing = false;
-      }
-    });
+  ngOnInit() {
+    console.log('Evaluator Component Initialized');
   }
 
-  onSaveCorrection(approved: boolean = false) {
-    if (!this.currentTranslation?.id) return;
-    
-    this.isProcessing = true;
-    this.translationService.updateCorrection(
-      this.currentTranslation.id, 
-      this.correctedText, 
-      approved
-    ).subscribe({
-      next: (res) => {
-        this.currentTranslation = res;
-        this.isProcessing = false;
-        this.isCorrected = true;
-        setTimeout(() => this.isCorrected = false, 3000);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to save correction.';
-        this.isProcessing = false;
-      }
-    });
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  onCopy() {
-    if (!this.correctedText) return;
+  async onEvaluate() {
+    const english = this.englishText().trim();
+    const tamil = this.tamilTranslation().trim();
+
+    if (!english || !tamil) return;
     
-    navigator.clipboard.writeText(this.correctedText).then(() => {
-      this.isCopied = true;
-      setTimeout(() => this.isCopied = false, 2000);
+    if (english.length > this.maxChars || tamil.length > this.maxChars) {
+      this.errorMessage.set(`Input is too long. Please limit both texts to ${this.maxChars} characters for a precise evaluation.`);
+      return;
+    }
+
+    this.isProcessing.set(true);
+    this.errorMessage.set('');
+    this.evaluationResult.set(null);
+    this.cdr.detectChanges();
+    
+    console.log('--- Evaluation Started (Signals/Async) ---');
+    try {
+      const response = await firstValueFrom(this.evaluationService.evaluate({
+        englishText: english,
+        tamilTranslation: tamil
+      }));
+
+      if (response) {
+        console.log('Successfully captured evaluation response:', response);
+        this.evaluationResult.set(response);
+      } else {
+        console.warn('Evaluation response was empty.');
+      }
+    } catch (err) {
+      console.error('Critical Evaluation Error:', err);
+      this.errorMessage.set('Evaluation failed. Please verify your connection or backend status.');
+    } finally {
+      this.isProcessing.set(false);
+      console.log('--- Evaluation Finished (Signals/Async) ---');
+      this.cdr.detectChanges();
+    }
+  }
+
+  onCopyImproved() {
+    const improved = this.evaluationResult()?.improvedTranslation;
+    if (!improved) return;
+    
+    navigator.clipboard.writeText(improved).then(() => {
+      this.isCopied.set(true);
+      setTimeout(() => this.isCopied.set(false), 2000);
     });
   }
 
   reset() {
-    this.correctedText = this.currentTranslation?.translatedText || '';
+    this.englishText.set('');
+    this.tamilTranslation.set('');
+    this.evaluationResult.set(null);
+    this.errorMessage.set('');
   }
 }

@@ -1,0 +1,96 @@
+<div class="corrector-container">
+  <header class="corrector-header">
+    <h1 class="title">Divine Translator</h1>
+    <p class="subtitle">Translate divine texts with spiritual intent.</p>
+  </header>
+
+  <div class="workspace">
+    <!-- Source Section -->
+    <div class="card premium-card source-card">
+      <div class="card-header">
+        <span class="lang-tag">Source Text</span>
+        <h3 class="card-title">Divine Source</h3>
+      </div>
+      <div class="card-body">
+        <textarea 
+          [(ngModel)]="sourceText" 
+          class="text-input" 
+          rows="25"
+          placeholder="Enter English or Sanskrit text to translate..."
+          [disabled]="isProcessing"
+        ></textarea>
+        <div class="char-counter" [class.limit-reached]="sourceText.length > maxChars">
+          {{ sourceText.length }} / {{ maxChars }}
+        </div>
+      </div>
+      <div class="card-footer">
+        <button 
+          (click)="onTranslate()" 
+          class="primary-btn" 
+          [disabled]="isProcessing || !sourceText.trim() || sourceText.length > maxChars"
+        >
+          @if (!isProcessing) {
+            <span>Translate</span>
+          } @else {
+            <span class="loader"></span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Result/Correction Section -->
+    <div class="card premium-card translation-card" [class.empty]="!currentTranslation">
+      <div class="card-header">
+        <span class="lang-tag">Tamil Translation</span>
+        <h3 class="card-title">Translator Workspace</h3>
+      </div>
+      <div class="card-body">
+        @if (!currentTranslation && !isProcessing) {
+          <div class="empty-state">
+            <div class="empty-icon">🕊️</div>
+            <p>Enter text on the left to begin the divine translation process.</p>
+          </div>
+        }
+        
+        @if (currentTranslation || isProcessing) {
+          <textarea 
+            [(ngModel)]="correctedText" 
+            class="text-input tamil-text" 
+            rows="25"
+            placeholder="Translation will appear here..."
+            [disabled]="isProcessing || !currentTranslation"
+          ></textarea>
+        }
+      </div>
+      @if (currentTranslation) {
+        <div class="card-footer">
+          <button (click)="onCopy()" class="secondary-btn copy-btn" [disabled]="isProcessing">
+            <span *ngIf="!isCopied">Copy Text</span>
+            <span *ngIf="isCopied">Copied!</span>
+          </button>
+          <div class="spacer"></div>
+          <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing">Reset</button>
+          <button (click)="onSaveCorrection(true)" class="primary-btn" [disabled]="isProcessing">
+            <span>Approve & Save</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="error-banner animate-fade-in">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isCorrected) {
+    <div class="feedback-toast glass-morphism animate-fade-in">
+      <div class="toast-icon">✨</div>
+      <div class="toast-content">
+        <h4>Translation Saved</h4>
+        <p>The translation has been updated and archived.</p>
+      </div>
+    </div>
+  }
+</div>
