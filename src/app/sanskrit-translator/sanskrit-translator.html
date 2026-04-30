@@ -1,0 +1,134 @@
+<div class="sanskrit-container">
+  <header class="page-header">
+    <h1 class="title">Sanskrit Sloka Translator</h1>
+    <p class="subtitle">AI-powered Sanskrit to Tamil translation in the style of Srila Prabhupada.</p>
+  </header>
+
+  <div class="workspace">
+    <!-- Input Section -->
+    <div class="card input-card">
+      <div class="card-header">
+        <h3 class="card-title">Sloka Input</h3>
+        <button class="glossary-btn" (click)="toggleGlossary()">
+          📖 Dictionary ({{glossaryEntries.length}})
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>Sloka Number (Optional)</label>
+          <input type="text" [(ngModel)]="slokaNumber" placeholder="e.g. 1.1.1" class="sloka-num-input">
+        </div>
+        <div class="form-group">
+          <label>Sanskrit Text</label>
+          <textarea 
+            [(ngModel)]="sanskritText" 
+            class="text-input" 
+            rows="10"
+            placeholder="Paste Sanskrit Sloka here..."
+            [disabled]="isProcessing"
+          ></textarea>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button 
+          (click)="onTranslate()" 
+          class="primary-btn" 
+          [disabled]="isProcessing || !sanskritText.trim()"
+        >
+          @if (!isProcessing) {
+            <span>Translate Sloka</span>
+          } @else {
+            <span class="loader"></span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Output Section -->
+    <div class="card output-card" [class.empty]="!currentSloka">
+      <div class="card-header">
+        <h3 class="card-title">Tamil Translation</h3>
+        @if (currentSloka) {
+          <span class="sloka-badge">{{currentSloka.slokaNumber}}</span>
+        }
+      </div>
+      <div class="card-body">
+        @if (!currentSloka && !isProcessing) {
+          <div class="empty-state">
+            <div class="empty-icon">📜</div>
+            <p>Enter a Sanskrit sloka to generate word-for-word meaning and purport.</p>
+          </div>
+        }
+
+        @if (currentSloka || isProcessing) {
+          <div class="result-sections">
+            <div class="section">
+              <label>Transliteration</label>
+              <textarea [(ngModel)]="editedTransliteration" class="tamil-text" rows="3"></textarea>
+            </div>
+            
+            <div class="section">
+              <label>Word-to-Word Meaning</label>
+              <textarea [(ngModel)]="editedWordToWord" class="tamil-text" rows="6"></textarea>
+            </div>
+
+            <div class="section">
+              <label>Translation / Purport</label>
+              <textarea [(ngModel)]="editedPurport" class="tamil-text" rows="8"></textarea>
+            </div>
+          </div>
+        }
+      </div>
+      @if (currentSloka) {
+        <div class="card-footer">
+          <button (click)="onSave()" class="primary-btn" [disabled]="isProcessing">
+            Save Approved Version
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Glossary Modal -->
+  @if (showGlossaryModal) {
+    <div class="modal-overlay" (click)="toggleGlossary()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h3>Custom Dictionary</h3>
+          <button class="close-btn" (click)="toggleGlossary()">×</button>
+        </header>
+        <div class="modal-body">
+          <div class="add-term-form">
+            <input type="text" [(ngModel)]="newSourceWord" placeholder="English/Sanskrit Word">
+            <input type="text" [(ngModel)]="newTargetWord" placeholder="Desired Tamil Meaning">
+            <button (click)="addToGlossary()" class="primary-btn">Add</button>
+          </div>
+          <div class="terms-list">
+            @for (entry of glossaryEntries; track entry.id) {
+              <div class="term-item">
+                <span class="source">{{entry.sourceWord}}</span>
+                <span class="arrow">→</span>
+                <span class="target">{{entry.targetWord}}</span>
+                <button class="delete-btn" (click)="deleteGlossaryEntry(entry.id)">🗑️</button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-banner">{{ errorMessage }}</div>
+  }
+
+  @if (isSaved) {
+    <div class="feedback-toast glass-morphism animate-fade-in">
+      <div class="toast-icon">✨</div>
+      <div class="toast-content">
+        <h4>Sloka Saved</h4>
+        <p>The translation has been archived in the database.</p>
+      </div>
+    </div>
+  }
+</div>
