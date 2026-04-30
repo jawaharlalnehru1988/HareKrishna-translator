@@ -16,7 +16,7 @@ export interface EvaluationResponse {
   providedIn: 'root'
 })
 export class EvaluationService {
-  private apiUrl = 'http://localhost:8080/api/evaluation/evaluate';
+  private apiUrl = '/api/evaluation/evaluate';
 
   constructor(private http: HttpClient) {}
 

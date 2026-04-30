@@ -16,7 +16,7 @@ export interface Translation {
   providedIn: 'root'
 })
 export class TranslationService {
-  private apiUrl = 'http://localhost:8080/api/translations';
+  private apiUrl = '/api/translations';
 
   constructor(private http: HttpClient) {}
 
