@@ -3,12 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface SanskritSloka {
+export interface Sloka {
   id?: number;
-  slokaNumber?: string;
+  scriptureId: number;
+  scriptureTitle?: string;
+  majorDivision: number;
+  minorDivision: number;
+  verseNumber: number;
   sanskritText: string;
   transliteration?: string;
   wordToWordMeaning?: string;
+  translation?: string;
   purport?: string;
   isApproved?: boolean;
 }
@@ -21,15 +26,21 @@ export class SanskritTranslatorService {
 
   constructor(private http: HttpClient) {}
 
-  translate(request: { slokaNumber?: string, sanskritText: string }): Observable<SanskritSloka> {
-    return this.http.post<SanskritSloka>(`${this.apiUrl}/translate`, request);
+  translate(request: { 
+    scriptureId: number, 
+    majorDivision: number, 
+    minorDivision: number, 
+    verseNumber: number,
+    sanskritText: string 
+  }): Observable<Sloka> {
+    return this.http.post<Sloka>(`${this.apiUrl}/translate`, request);
   }
 
-  saveApproved(sloka: SanskritSloka): Observable<SanskritSloka> {
-    return this.http.post<SanskritSloka>(`${this.apiUrl}/save`, sloka);
+  saveApproved(sloka: Sloka): Observable<Sloka> {
+    return this.http.post<Sloka>(`${this.apiUrl}/save`, sloka);
   }
 
-  getHistory(): Observable<SanskritSloka[]> {
-    return this.http.get<SanskritSloka[]>(`${this.apiUrl}/history`);
+  getHistory(): Observable<Sloka[]> {
+    return this.http.get<Sloka[]>(`${this.apiUrl}/history`);
   }
 }

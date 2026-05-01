@@ -83,6 +83,13 @@
   }
 }
 
+.hierarchy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .sloka-num-input {
   width: 100%;
   padding: 0.8rem;
