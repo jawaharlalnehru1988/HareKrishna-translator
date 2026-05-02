@@ -11,10 +11,19 @@ export interface Sloka {
   minorDivision: number;
   verseNumber: number;
   sanskritText: string;
+  
+  // Tamil
   transliteration?: string;
   wordToWordMeaning?: string;
   translation?: string;
   purport?: string;
+
+  // English
+  transliterationEn?: string;
+  wordToWordMeaningEn?: string;
+  translationEn?: string;
+  purportEn?: string;
+
   isApproved?: boolean;
 }
 
@@ -31,7 +40,8 @@ export class SanskritTranslatorService {
     majorDivision: number, 
     minorDivision: number, 
     verseNumber: number,
-    sanskritText: string 
+    sanskritText: string,
+    targetLanguage: string
   }): Observable<Sloka> {
     return this.http.post<Sloka>(`${this.apiUrl}/translate`, request);
   }

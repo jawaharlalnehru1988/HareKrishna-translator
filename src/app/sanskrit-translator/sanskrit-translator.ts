@@ -5,6 +5,7 @@ import { SanskritTranslatorService, Sloka } from '../services/sanskrit-translato
 import { GlossaryService, GlossaryEntry } from '../services/glossary.service';
 import { ScriptureService, Scripture } from '../services/scripture.service';
 import { finalize } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sanskrit-translator',
@@ -18,6 +19,9 @@ export class SanskritTranslator implements OnInit {
   scriptures: Scripture[] = [];
   selectedScripture: Scripture | null = null;
   
+  // Language Selection
+  targetLanguage: 'TAMIL' | 'ENGLISH' = 'TAMIL';
+  
   // Hierarchy fields
   majorDivision: number | null = null;
   minorDivision: number | null = null;
@@ -26,7 +30,7 @@ export class SanskritTranslator implements OnInit {
   
   currentSloka: Sloka | null = null;
   
-  // Editable fields for the result
+  // Editable fields for the result (Dynamic based on language)
   editedTransliteration: string = '';
   editedWordToWord: string = '';
   editedTranslation: string = '';
@@ -46,10 +50,18 @@ export class SanskritTranslator implements OnInit {
     private translatorService: SanskritTranslatorService,
     private glossaryService: GlossaryService,
     private scriptureService: ScriptureService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    // Determine language from route
+    this.route.data.subscribe(data => {
+      if (data['language']) {
+        this.targetLanguage = data['language'];
+      }
+    });
+
     this.loadScriptures();
     this.loadGlossary();
   }
@@ -74,7 +86,6 @@ export class SanskritTranslator implements OnInit {
     
     this.isProcessing = true;
     this.errorMessage = '';
-    this.currentSloka = null;
     this.cdr.detectChanges();
     
     this.translatorService.translate({
@@ -82,7 +93,8 @@ export class SanskritTranslator implements OnInit {
       majorDivision: this.majorDivision || 0,
       minorDivision: this.minorDivision || 0,
       verseNumber: this.verseNumber || 0,
-      sanskritText: this.sanskritText
+      sanskritText: this.sanskritText,
+      targetLanguage: this.targetLanguage
     }).pipe(
       finalize(() => {
         this.isProcessing = false;
@@ -90,11 +102,23 @@ export class SanskritTranslator implements OnInit {
       })
     ).subscribe({
       next: (res) => {
-        this.currentSloka = res;
-        this.editedTransliteration = res.transliteration || '';
-        this.editedWordToWord = res.wordToWordMeaning || '';
-        this.editedTranslation = res.translation || '';
-        this.editedPurport = res.purport || '';
+        if (this.currentSloka && this.currentSloka.sanskritText === res.sanskritText) {
+           if (this.targetLanguage === 'TAMIL') {
+             this.currentSloka.transliteration = res.transliteration;
+             this.currentSloka.wordToWordMeaning = res.wordToWordMeaning;
+             this.currentSloka.translation = res.translation;
+             this.currentSloka.purport = res.purport;
+           } else {
+             this.currentSloka.transliterationEn = res.transliterationEn;
+             this.currentSloka.wordToWordMeaningEn = res.wordToWordMeaningEn;
+             this.currentSloka.translationEn = res.translationEn;
+             this.currentSloka.purportEn = res.purportEn;
+           }
+        } else {
+          this.currentSloka = res;
+        }
+
+        this.syncEditableFields();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -104,15 +128,38 @@ export class SanskritTranslator implements OnInit {
     });
   }
 
+  syncEditableFields() {
+    if (!this.currentSloka) return;
+    if (this.targetLanguage === 'TAMIL') {
+      this.editedTransliteration = this.currentSloka.transliteration || '';
+      this.editedWordToWord = this.currentSloka.wordToWordMeaning || '';
+      this.editedTranslation = this.currentSloka.translation || '';
+      this.editedPurport = this.currentSloka.purport || '';
+    } else {
+      this.editedTransliteration = this.currentSloka.transliterationEn || '';
+      this.editedWordToWord = this.currentSloka.wordToWordMeaningEn || '';
+      this.editedTranslation = this.currentSloka.translationEn || '';
+      this.editedPurport = this.currentSloka.purportEn || '';
+    }
+  }
+
   onSave() {
     if (!this.currentSloka) return;
     
+    if (this.targetLanguage === 'TAMIL') {
+      this.currentSloka.transliteration = this.editedTransliteration;
+      this.currentSloka.wordToWordMeaning = this.editedWordToWord;
+      this.currentSloka.translation = this.editedTranslation;
+      this.currentSloka.purport = this.editedPurport;
+    } else {
+      this.currentSloka.transliterationEn = this.editedTransliteration;
+      this.currentSloka.wordToWordMeaningEn = this.editedWordToWord;
+      this.currentSloka.translationEn = this.editedTranslation;
+      this.currentSloka.purportEn = this.editedPurport;
+    }
+
     const slokaToSave: Sloka = {
       ...this.currentSloka,
-      transliteration: this.editedTransliteration,
-      wordToWordMeaning: this.editedWordToWord,
-      translation: this.editedTranslation,
-      purport: this.editedPurport,
       isApproved: true
     };
 
@@ -164,9 +211,12 @@ export class SanskritTranslator implements OnInit {
   }
 
   onScriptureChange() {
-    // Reset values when switching books
     this.majorDivision = null;
     this.minorDivision = null;
     this.verseNumber = null;
+  }
+
+  onLanguageChange() {
+    this.syncEditableFields();
   }
 }
