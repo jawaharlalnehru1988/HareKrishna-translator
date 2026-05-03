@@ -9,6 +9,11 @@
     <div class="card premium-card source-card">
       <div class="card-header">
         <span class="lang-tag">Source Text</span>
+        <select [(ngModel)]="sourceLanguage" class="lang-select">
+          @for (lang of sourceLanguages; track lang) {
+            <option [value]="lang">{{lang}}</option>
+          }
+        </select>
         <h3 class="card-title">Divine Source</h3>
       </div>
       <div class="card-body">
@@ -16,7 +21,7 @@
           [(ngModel)]="sourceText" 
           class="text-input" 
           rows="25"
-          placeholder="Enter English or Sanskrit text to translate..."
+          placeholder="Enter text to translate..."
           [disabled]="isProcessing"
         ></textarea>
         <div class="char-counter" [class.limit-reached]="sourceText.length > maxChars">
@@ -30,7 +35,7 @@
           [disabled]="isProcessing || !sourceText.trim() || sourceText.length > maxChars"
         >
           @if (!isProcessing) {
-            <span>Translate</span>
+            <span>Translate to {{targetLanguage}}</span>
           } @else {
             <span class="loader"></span>
           }
@@ -41,7 +46,12 @@
     <!-- Result/Correction Section -->
     <div class="card premium-card translation-card" [class.empty]="!currentTranslation">
       <div class="card-header">
-        <span class="lang-tag">Tamil Translation</span>
+        <span class="lang-tag">{{targetLanguage}} Translation</span>
+        <select [(ngModel)]="targetLanguage" class="lang-select">
+          @for (lang of targetLanguages; track lang) {
+            <option [value]="lang">{{lang}}</option>
+          }
+        </select>
         <h3 class="card-title">Translator Workspace</h3>
       </div>
       <div class="card-body">
@@ -51,22 +61,37 @@
             <p>Enter text on the left to begin the divine translation process.</p>
           </div>
         }
-        
-        @if (currentTranslation || isProcessing) {
+
+        @if (isProcessing) {
+          <div class="progress-container animate-fade-in">
+            <div class="progress-info">
+              <span class="progress-msg">{{progressMessage}}</span>
+              <span class="progress-val">{{progressPercentage}}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+            </div>
+          </div>
+        }
+
+        @if (currentTranslation || (isProcessing && progressPercentage > 0)) {
           <textarea 
             [(ngModel)]="correctedText" 
             class="text-input tamil-text" 
             rows="25"
             placeholder="Translation will appear here..."
-            [disabled]="isProcessing || !currentTranslation"
+            [disabled]="isProcessing"
           ></textarea>
         }
       </div>
       @if (currentTranslation) {
         <div class="card-footer">
           <button (click)="onCopy()" class="secondary-btn copy-btn" [disabled]="isProcessing">
-            <span *ngIf="!isCopied">Copy Text</span>
-            <span *ngIf="isCopied">Copied!</span>
+            @if (!isCopied) {
+              <span>Copy Text</span>
+            } @else {
+              <span>Copied!</span>
+            }
           </button>
           <div class="spacer"></div>
           <button (click)="reset()" class="secondary-btn" [disabled]="isProcessing">Reset</button>

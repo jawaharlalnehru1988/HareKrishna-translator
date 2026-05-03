@@ -64,6 +64,40 @@
   }
 }
 
+.progress-container {
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    .progress-msg { color: var(--text-main); }
+    .progress-val { color: var(--primary); }
+  }
+
+  .progress-track {
+    height: 8px;
+    background: var(--bg-light);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
 .card-header {
   padding: 25px 30px;
   border-bottom: 1px solid var(--border-color);
@@ -80,6 +114,26 @@
     background: color-mix(in srgb, var(--primary) 10%, transparent);
     padding: 4px 12px;
     border-radius: 20px;
+  }
+
+  .lang-select {
+    margin-left: auto;
+    margin-right: 1rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+    }
   }
   
   .card-title {

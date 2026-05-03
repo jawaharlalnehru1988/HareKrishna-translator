@@ -9,6 +9,7 @@ export interface Translation {
   translatedText?: string;
   correctedText?: string;
   sourceLanguage?: string;
+  targetLanguage?: string;
   createdAt?: string;
   approved?: boolean;
 }
@@ -25,8 +26,18 @@ export class TranslationService {
     return this.http.get<Translation[]>(this.apiUrl);
   }
 
-  translate(sourceText: string): Observable<Translation> {
-    return this.http.post<Translation>(this.apiUrl, { sourceText });
+  // Translates a single batch (no DB save)
+  translateBatch(sourceText: string, sourceLanguage: string, targetLanguage: string): Observable<string> {
+    return this.http.post(
+      `${this.apiUrl}/batch`, 
+      { sourceText, sourceLanguage, targetLanguage },
+      { responseType: 'text' }
+    );
+  }
+
+  // Saves the final combined translation to DB
+  saveFinal(translation: Translation): Observable<Translation> {
+    return this.http.post<Translation>(`${this.apiUrl}/save`, translation);
   }
 
   updateCorrection(id: number, correctedText: string, approved: boolean): Observable<Translation> {
