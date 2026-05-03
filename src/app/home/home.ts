@@ -19,18 +19,11 @@ export class Home {
       color: '#4F46E5'
     },
     {
-      title: 'Sanskrit-Tamil Sloka',
-      description: 'Specialized tool for translating Sanskrit slokas with Tamil word-by-word meaning.',
-      route: '/sanskrit-tamil',
-      icon: '🪔',
-      color: '#FF9933'
-    },
-    {
-      title: 'Sanskrit-English Sloka',
-      description: 'Transform Sanskrit verses into English in the style of Srila Prabhupada.',
-      route: '/sanskrit-english',
+      title: 'Sanskrit Sloka Translator',
+      description: 'AI-powered word-for-word translation for Sanskrit slokas with Tamil and English support.',
+      route: '/sanskrit',
       icon: '📜',
-      color: '#FF5500'
+      color: '#FF9933'
     },
     {
       title: 'Translation Corrector',

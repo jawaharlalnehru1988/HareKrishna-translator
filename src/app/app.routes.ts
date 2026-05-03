@@ -9,8 +9,9 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: Home },
   { path: 'translator', component: Translator },
-  { path: 'sanskrit-tamil', component: SanskritTranslator, data: { language: 'TAMIL' } },
-  { path: 'sanskrit-english', component: SanskritTranslator, data: { language: 'ENGLISH' } },
+  { path: 'sanskrit', component: SanskritTranslator },
+  { path: 'sanskrit-tamil', redirectTo: 'sanskrit' },
+  { path: 'sanskrit-english', redirectTo: 'sanskrit' },
   { path: 'corrector', component: TranslationCorrector },
   { path: 'history', component: History }
 ];

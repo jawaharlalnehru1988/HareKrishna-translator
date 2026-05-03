@@ -59,10 +59,8 @@ export class SanskritTranslator implements OnInit {
   ngOnInit() {
     // Determine module language from route
     this.route.data.subscribe(data => {
-      if (data['language']) {
-        this.moduleLanguage = data['language'];
-        this.activeTab = this.moduleLanguage; // Default tab matches module
-      }
+      this.moduleLanguage = data['language'] || 'TAMIL';
+      this.activeTab = this.moduleLanguage; // Default tab matches module
     });
 
     this.loadScriptures();

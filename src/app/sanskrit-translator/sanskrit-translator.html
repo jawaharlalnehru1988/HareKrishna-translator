@@ -15,6 +15,15 @@
       </div>
       <div class="card-body">
         
+        <!-- Target Language Selection -->
+        <div class="form-group">
+          <label>Target Language</label>
+          <div class="language-toggle">
+            <button class="toggle-btn" [class.active]="moduleLanguage === 'TAMIL'" (click)="moduleLanguage = 'TAMIL'; activeTab = 'TAMIL'">Tamil</button>
+            <button class="toggle-btn" [class.active]="moduleLanguage === 'ENGLISH'" (click)="moduleLanguage = 'ENGLISH'; activeTab = 'ENGLISH'">English</button>
+          </div>
+        </div>
+
         <!-- Scripture Selection -->
         <div class="form-group">
           <label>Select Book / Scripture</label>

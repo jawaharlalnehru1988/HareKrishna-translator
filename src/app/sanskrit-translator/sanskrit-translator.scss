@@ -83,6 +83,37 @@
   }
 }
 
+.language-toggle {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+
+  .toggle-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.active {
+      background: white;
+      color: #FF9933;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    &:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.5);
+      color: #334155;
+    }
+  }
+}
+
 .hierarchy-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
