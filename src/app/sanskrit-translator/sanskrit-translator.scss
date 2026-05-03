@@ -163,6 +163,8 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .text-input, .tamil-text {
+  width: 100%;
+  display: block;
   padding: 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 1rem;
@@ -246,6 +248,23 @@
     cursor: not-allowed;
   }
 }
+
+.secondary-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+}
+
 
 /* Modal Styling */
 .modal-overlay {
@@ -363,3 +382,72 @@
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+.checkbox-group {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px dashed #cbd5e1;
+}
+
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #475569;
+  user-select: none;
+  font-weight: 500;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 22px;
+    width: 22px;
+    background-color: #fff;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  &:hover input ~ .checkmark {
+    border-color: #FF9933;
+  }
+
+  input:checked ~ .checkmark {
+    background-color: #FF9933;
+    border-color: #FF9933;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+}
+

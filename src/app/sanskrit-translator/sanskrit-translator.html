@@ -1,6 +1,6 @@
 <div class="sanskrit-container">
   <header class="page-header">
-    <h1 class="title">Sanskrit to {{targetLanguage | titlecase}} Translator</h1>
+    <h1 class="title">Sanskrit to {{moduleLanguage | titlecase}} Translator</h1>
     <p class="subtitle">AI-powered Sanskrit translation in the style of Srila Prabhupada.</p>
   </header>
 
@@ -19,6 +19,9 @@
         <div class="form-group">
           <label>Select Book / Scripture</label>
           <select [(ngModel)]="selectedScripture" class="sloka-num-input" (change)="onScriptureChange()">
+            @if (scriptures.length === 0) {
+              <option [ngValue]="null" disabled selected>Loading scriptures...</option>
+            }
             @for (book of scriptures; track book.id) {
               <option [ngValue]="book">{{book.title}}</option>
             }
@@ -52,6 +55,14 @@
             [disabled]="isProcessing"
           ></textarea>
         </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="includePurport">
+            <span class="checkmark"></span>
+            Include Spiritual Purport (Srila Prabhupada Style)
+          </label>
+        </div>
       </div>
       <div class="card-footer">
         <button 
@@ -60,7 +71,7 @@
           [disabled]="isProcessing || !sanskritText.trim()"
         >
           @if (!isProcessing) {
-            <span>Translate to {{targetLanguage | titlecase}}</span>
+            <span>Translate to {{moduleLanguage | titlecase}}</span>
           } @else {
             <span class="loader"></span>
           }
@@ -71,7 +82,7 @@
     <!-- Output Section -->
     <div class="card output-card" [class.empty]="!currentSloka">
       <div class="card-header">
-        <h3 class="card-title">{{targetLanguage | titlecase}} Result</h3>
+        <h3 class="card-title">{{activeTab | titlecase}} Result</h3>
         @if (currentSloka) {
           <span class="sloka-badge">
             {{currentSloka.scriptureTitle}} {{currentSloka.majorDivision}}.{{currentSloka.minorDivision}}.{{currentSloka.verseNumber}}
@@ -82,17 +93,17 @@
         @if (!currentSloka && !isProcessing) {
           <div class="empty-state">
             <div class="empty-icon">📜</div>
-            <p>Enter a Sanskrit sloka to generate word-for-word meaning and purport.</p>
+            <p>Enter a Sanskrit sloka to generate word-for-word meaning.</p>
           </div>
         }
 
         @if (currentSloka || isProcessing) {
           <!-- Tab Navigation -->
           <div class="result-tabs">
-            <button class="tab-btn" [class.active]="targetLanguage === 'TAMIL'" (click)="targetLanguage = 'TAMIL'; syncEditableFields()">
+            <button class="tab-btn" [class.active]="activeTab === 'TAMIL'" (click)="onTabChange('TAMIL')">
               Tamil Version
             </button>
-            <button class="tab-btn" [class.active]="targetLanguage === 'ENGLISH'" (click)="targetLanguage = 'ENGLISH'; syncEditableFields()">
+            <button class="tab-btn" [class.active]="activeTab === 'ENGLISH'" (click)="onTabChange('ENGLISH')">
               English Version
             </button>
           </div>
@@ -101,32 +112,34 @@
             <div class="section">
               <label>
                 Transliteration 
-                <span class="lang-indicator">{{targetLanguage === 'TAMIL' ? 'Tamil' : 'IAST'}}</span>
+                <span class="lang-indicator">{{activeTab === 'TAMIL' ? 'Tamil' : 'IAST'}}</span>
               </label>
-              <textarea [(ngModel)]="editedTransliteration" class="tamil-text" rows="3" [class.english-text]="targetLanguage === 'ENGLISH'"></textarea>
+              <textarea [(ngModel)]="editedTransliteration" class="tamil-text" rows="3" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
             
             <div class="section">
               <label>Word-to-Word Meaning</label>
-              <textarea [(ngModel)]="editedWordToWord" class="tamil-text" rows="6" [class.english-text]="targetLanguage === 'ENGLISH'"></textarea>
+              <textarea [(ngModel)]="editedWordToWord" class="tamil-text" rows="6" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
 
             <div class="section">
               <label>Translation</label>
-              <textarea [(ngModel)]="editedTranslation" class="tamil-text" rows="5" [class.english-text]="targetLanguage === 'ENGLISH'"></textarea>
+              <textarea [(ngModel)]="editedTranslation" class="tamil-text" rows="5" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
 
-            <div class="section">
-              <label>Purport</label>
-              <textarea [(ngModel)]="editedPurport" class="tamil-text" rows="10" [class.english-text]="targetLanguage === 'ENGLISH'"></textarea>
-            </div>
+            @if (includePurport) {
+              <div class="section">
+                <label>Purport</label>
+                <textarea [(ngModel)]="editedPurport" class="tamil-text" rows="10" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
+              </div>
+            }
           </div>
         }
       </div>
       @if (currentSloka) {
         <div class="card-footer">
           <button (click)="onSave()" class="primary-btn" [disabled]="isProcessing">
-            Save Approved {{targetLanguage | titlecase}} Version
+            Save Approved {{activeTab | titlecase}} Version
           </button>
         </div>
       }
@@ -171,7 +184,7 @@
       <div class="toast-icon">✨</div>
       <div class="toast-content">
         <h4>Sloka Saved</h4>
-        <p>The {{targetLanguage | lowercase}} version has been archived.</p>
+        <p>The {{activeTab | lowercase}} version has been archived.</p>
       </div>
     </div>
   }

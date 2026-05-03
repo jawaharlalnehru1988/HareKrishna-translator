@@ -41,9 +41,14 @@ export class SanskritTranslatorService {
     minorDivision: number, 
     verseNumber: number,
     sanskritText: string,
-    targetLanguage: string
+    targetLanguage: string,
+    includePurport: boolean
   }): Observable<Sloka> {
     return this.http.post<Sloka>(`${this.apiUrl}/translate`, request);
+  }
+
+  generateTamil(sloka: Sloka): Observable<Sloka> {
+    return this.http.post<Sloka>(`${this.apiUrl}/generate-tamil`, sloka);
   }
 
   saveApproved(sloka: Sloka): Observable<Sloka> {

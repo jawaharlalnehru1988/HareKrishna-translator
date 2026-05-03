@@ -8,27 +8,16 @@
         <button class="secondary-btn">View Guidelines</button>
     </div>
 
-    <div class="hero-features">
-        <div class="feature-item">
-            <div class="feature-icon">🔍</div>
-            <div class="feature-text">
-                <h4>AI-Assisted Correction</h4>
-                <p>Smart suggestions to fix grammatical and contextual errors.</p>
+    <div class="module-grid">
+        @for (module of modules; track module.title) {
+            <div class="module-card" [routerLink]="module.route" [style.--accent]="module.color">
+                <div class="card-icon">{{ module.icon }}</div>
+                <div class="card-content">
+                    <h3>{{ module.title }}</h3>
+                    <p>{{ module.description }}</p>
+                </div>
+                <div class="card-arrow">→</div>
             </div>
-        </div>
-        <div class="feature-item">
-            <div class="feature-icon">📖</div>
-            <div class="feature-text">
-                <h4>Sanskrit & Hindi Support</h4>
-                <p>Comprehensive support for both source languages.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <div class="feature-icon">💾</div>
-            <div class="feature-text">
-                <h4>Translation History</h4>
-                <p>Keep track of all your corrections and improvements.</p>
-            </div>
-        </div>
+        }
     </div>
 </div>

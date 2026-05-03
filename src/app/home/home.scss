@@ -54,54 +54,96 @@
   }
 }
 
-.hero-features {
+.module-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
   width: 100%;
-  margin-top: 40px;
+  margin-top: 60px;
+  perspective: 1000px;
 }
 
-.feature-item {
-  background: var(--bg-white);
-  padding: 40px 30px;
-  border-radius: 24px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-soft);
-  transition: all 0.3s ease;
+.module-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 32px;
+  border-radius: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-align: left;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.8;
+  }
+
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-medium);
-    border-color: var(--primary-light);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border-color: var(--accent);
+    background: white;
+
+    .card-arrow {
+      transform: translateX(8px);
+      color: var(--accent);
+    }
+
+    .card-icon {
+      transform: scale(1.1) rotate(5deg);
+      background: var(--accent);
+      color: white;
+    }
   }
   
-  .feature-icon {
-    font-size: 40px;
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-    width: 70px;
-    height: 70px;
+  .card-icon {
+    font-size: 32px;
+    background: color-mix(in srgb, var(--accent) 12%, white);
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 18px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
   }
   
-  .feature-text {
-    h4 {
-      font-size: 1.25rem;
-      margin-bottom: 10px;
+  .card-content {
+    flex-grow: 1;
+
+    h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
     }
     
     p {
       color: var(--text-muted);
       font-size: 0.95rem;
       line-height: 1.5;
+      margin: 0;
     }
+  }
+
+  .card-arrow {
+    font-size: 24px;
+    color: var(--border-color);
+    transition: all 0.3s ease;
+    font-weight: 300;
   }
 }
 
@@ -110,9 +152,8 @@
     font-size: 3.5rem;
   }
   
-  .hero-features {
+  .module-grid {
     grid-template-columns: 1fr;
-    max-width: 500px;
   }
 }
 

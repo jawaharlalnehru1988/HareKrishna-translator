@@ -19,8 +19,10 @@ export class SanskritTranslator implements OnInit {
   scriptures: Scripture[] = [];
   selectedScripture: Scripture | null = null;
   
-  // Language Selection
-  targetLanguage: 'TAMIL' | 'ENGLISH' = 'TAMIL';
+  // Language Context
+  moduleLanguage: 'TAMIL' | 'ENGLISH' = 'TAMIL';
+  activeTab: 'TAMIL' | 'ENGLISH' = 'TAMIL';
+  includePurport: boolean = true;
   
   // Hierarchy fields
   majorDivision: number | null = null;
@@ -30,7 +32,7 @@ export class SanskritTranslator implements OnInit {
   
   currentSloka: Sloka | null = null;
   
-  // Editable fields for the result (Dynamic based on language)
+  // Editable fields for the result (Dynamic based on active tab)
   editedTransliteration: string = '';
   editedWordToWord: string = '';
   editedTranslation: string = '';
@@ -55,10 +57,11 @@ export class SanskritTranslator implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Determine language from route
+    // Determine module language from route
     this.route.data.subscribe(data => {
       if (data['language']) {
-        this.targetLanguage = data['language'];
+        this.moduleLanguage = data['language'];
+        this.activeTab = this.moduleLanguage; // Default tab matches module
       }
     });
 
@@ -67,10 +70,18 @@ export class SanskritTranslator implements OnInit {
   }
 
   loadScriptures() {
-    this.scriptureService.getAll().subscribe(res => {
-      this.scriptures = res;
-      if (res.length > 0) {
-        this.selectedScripture = res[0];
+    this.scriptureService.getAll().subscribe({
+      next: (res) => {
+        this.scriptures = res;
+        if (res.length > 0) {
+          this.selectedScripture = res[0];
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load scriptures', err);
+        this.errorMessage = 'Could not load scriptures. Please check if the backend is running.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -88,13 +99,15 @@ export class SanskritTranslator implements OnInit {
     this.errorMessage = '';
     this.cdr.detectChanges();
     
+    // Always use moduleLanguage for the API call to ensure full Agentic Graph execution
     this.translatorService.translate({
       scriptureId: this.selectedScripture.id,
       majorDivision: this.majorDivision || 0,
       minorDivision: this.minorDivision || 0,
       verseNumber: this.verseNumber || 0,
       sanskritText: this.sanskritText,
-      targetLanguage: this.targetLanguage
+      targetLanguage: this.moduleLanguage,
+      includePurport: this.includePurport
     }).pipe(
       finalize(() => {
         this.isProcessing = false;
@@ -102,22 +115,7 @@ export class SanskritTranslator implements OnInit {
       })
     ).subscribe({
       next: (res) => {
-        if (this.currentSloka && this.currentSloka.sanskritText === res.sanskritText) {
-           if (this.targetLanguage === 'TAMIL') {
-             this.currentSloka.transliteration = res.transliteration;
-             this.currentSloka.wordToWordMeaning = res.wordToWordMeaning;
-             this.currentSloka.translation = res.translation;
-             this.currentSloka.purport = res.purport;
-           } else {
-             this.currentSloka.transliterationEn = res.transliterationEn;
-             this.currentSloka.wordToWordMeaningEn = res.wordToWordMeaningEn;
-             this.currentSloka.translationEn = res.translationEn;
-             this.currentSloka.purportEn = res.purportEn;
-           }
-        } else {
-          this.currentSloka = res;
-        }
-
+        this.currentSloka = res;
         this.syncEditableFields();
         this.cdr.detectChanges();
       },
@@ -130,7 +128,8 @@ export class SanskritTranslator implements OnInit {
 
   syncEditableFields() {
     if (!this.currentSloka) return;
-    if (this.targetLanguage === 'TAMIL') {
+    
+    if (this.activeTab === 'TAMIL') {
       this.editedTransliteration = this.currentSloka.transliteration || '';
       this.editedWordToWord = this.currentSloka.wordToWordMeaning || '';
       this.editedTranslation = this.currentSloka.translation || '';
@@ -146,7 +145,7 @@ export class SanskritTranslator implements OnInit {
   onSave() {
     if (!this.currentSloka) return;
     
-    if (this.targetLanguage === 'TAMIL') {
+    if (this.activeTab === 'TAMIL') {
       this.currentSloka.transliteration = this.editedTransliteration;
       this.currentSloka.wordToWordMeaning = this.editedWordToWord;
       this.currentSloka.translation = this.editedTranslation;
@@ -216,7 +215,8 @@ export class SanskritTranslator implements OnInit {
     this.verseNumber = null;
   }
 
-  onLanguageChange() {
+  onTabChange(tab: 'TAMIL' | 'ENGLISH') {
+    this.activeTab = tab;
     this.syncEditableFields();
   }
 }
