@@ -1,42 +1,79 @@
 <div class="history-container">
-  <header class="history-header">
+  <header class="page-header">
     <h1 class="title">Translation History</h1>
-    <p class="subtitle">A divine archive of all your translations and corrections.</p>
+    <p class="subtitle">Review and manage your previous spiritual translations and corrections.</p>
   </header>
+
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="activeFilter === 'ALL'" (click)="activeFilter = 'ALL'">All</button>
+    <button class="filter-btn" [class.active]="activeFilter === 'SANSKRIT'" (click)="activeFilter = 'SANSKRIT'">Sanskrit Scriptures</button>
+    <button class="filter-btn" [class.active]="activeFilter === 'BASIC'" (click)="activeFilter = 'BASIC'">Basic Translations</button>
+  </div>
 
   @if (isLoading) {
     <div class="loading-state">
       <div class="loader"></div>
-      <p>Retrieving your spiritual records...</p>
-    </div>
-  } @else if (translations.length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon">📜</div>
-      <h3>No records found</h3>
-      <p>Start translating on the Corrector page to build your history.</p>
+      <p>Fetching your spiritual history...</p>
     </div>
   } @else {
     <div class="history-grid">
-      @for (item of translations; track item.id) {
-        <div class="history-card premium-card">
-          <div class="card-header">
-            <span class="date">{{ item.createdAt | date:'medium' }}</span>
-            <span class="status" [class.approved]="item.approved">
-              {{ item.approved ? 'Approved' : 'Pending' }}
-            </span>
-          </div>
-          <div class="card-body">
-            <div class="text-group">
-              <label>Original</label>
-              <p>{{ item.sourceText }}</p>
+      <!-- Sanskrit Slokas Section -->
+      @if (activeFilter === 'ALL' || activeFilter === 'SANSKRIT') {
+        @for (sloka of sanskritSlokas; track sloka.id) {
+          <div class="history-card sloka-card animate-fade-in">
+            <div class="card-tag">Sanskrit</div>
+            <div class="card-header">
+              <h3>{{sloka.scriptureTitle}}</h3>
+              <span class="verse-num">{{sloka.majorDivision}}.{{sloka.minorDivision}}.{{sloka.verseNumber}}</span>
             </div>
-            <div class="text-group">
-              <label>Final Translation</label>
-              <p class="tamil-text">{{ item.correctedText || item.translatedText }}</p>
+            <div class="card-body">
+              <p class="sanskrit-preview">{{sloka.sanskritText | slice:0:100}}...</p>
+              <div class="result-previews">
+                @if (sloka.translation) {
+                  <div class="preview-item">
+                    <label>Tamil</label>
+                    <p>{{sloka.translation | slice:0:80}}...</p>
+                  </div>
+                }
+                @if (sloka.translationEn) {
+                  <div class="preview-item">
+                    <label>English</label>
+                    <p>{{sloka.translationEn | slice:0:80}}...</p>
+                  </div>
+                }
+              </div>
             </div>
           </div>
-        </div>
+        }
+      }
+
+      <!-- Basic Translations Section -->
+      @if (activeFilter === 'ALL' || activeFilter === 'BASIC') {
+        @for (item of basicTranslations; track item.id) {
+          <div class="history-card basic-card animate-fade-in">
+            <div class="card-tag basic">Basic</div>
+            <div class="card-header">
+              <h3>English to Tamil</h3>
+              <span class="date-badge">Legacy</span>
+            </div>
+            <div class="card-body">
+              <div class="text-comparison">
+                <div class="source">{{item.sourceText | slice:0:60}}...</div>
+                <div class="arrow">↓</div>
+                <div class="target">{{item.translatedText | slice:0:60}}...</div>
+              </div>
+            </div>
+          </div>
+        }
       }
     </div>
+
+    @if (sanskritSlokas.length === 0 && basicTranslations.length === 0) {
+      <div class="empty-history">
+        <div class="empty-icon">📜</div>
+        <h3>Your history is empty</h3>
+        <p>Start translating Sanskrit slokas to build your spiritual archive.</p>
+      </div>
+    }
   }
 </div>

@@ -22,4 +22,8 @@ export class ScriptureService {
   getAll(): Observable<Scripture[]> {
     return this.http.get<Scripture[]>(this.apiUrl);
   }
+
+  create(scripture: Partial<Scripture>): Observable<Scripture> {
+    return this.http.post<Scripture>(this.apiUrl, scripture);
+  }
 }

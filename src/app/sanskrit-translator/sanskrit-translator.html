@@ -9,9 +9,14 @@
     <div class="card input-card">
       <div class="card-header">
         <h3 class="card-title">Sloka Input</h3>
-        <button class="glossary-btn" (click)="toggleGlossary()">
-          📖 Dictionary ({{glossaryEntries.length}})
-        </button>
+        <div class="header-actions">
+          <button (click)="toggleScriptureModal()" class="action-btn-small">
+            ➕ Add Book
+          </button>
+          <button (click)="toggleGlossary()" class="glossary-btn">
+            📖 Dictionary ({{glossaryEntries.length}})
+          </button>
+        </div>
       </div>
       <div class="card-body">
         
@@ -194,6 +199,36 @@
       <div class="toast-content">
         <h4>Sloka Saved</h4>
         <p>The {{activeTab | lowercase}} version has been archived.</p>
+      </div>
+    </div>
+  }
+  <!-- Scripture Modal -->
+  @if (showScriptureModal) {
+    <div class="modal-overlay" (click)="toggleScriptureModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add New Scripture</h3>
+          <button class="close-btn" (click)="toggleScriptureModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Scripture Title</label>
+            <input type="text" [(ngModel)]="newScriptureTitle" placeholder="e.g., Srimad Bhagavatam" class="sloka-num-input">
+          </div>
+          <div class="form-group">
+            <label>Major Division Name</label>
+            <input type="text" [(ngModel)]="newMajorDivisionName" placeholder="e.g., Canto or Kanda" class="sloka-num-input">
+          </div>
+          <div class="form-group">
+            <label>Minor Division Name</label>
+            <input type="text" [(ngModel)]="newMinorDivisionName" placeholder="e.g., Chapter or Sarga" class="sloka-num-input">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="primary-btn" (click)="addScripture()" [disabled]="!newScriptureTitle || isProcessing">
+            Save Scripture
+          </button>
+        </div>
       </div>
     </div>
   }

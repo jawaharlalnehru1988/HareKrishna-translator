@@ -44,6 +44,12 @@ export class SanskritTranslator implements OnInit {
   showGlossaryModal: boolean = false;
   glossaryEntries: GlossaryEntry[] = [];
 
+  // Scripture Management
+  showScriptureModal: boolean = false;
+  newScriptureTitle: string = '';
+  newMajorDivisionName: string = 'Kanda';
+  newMinorDivisionName: string = 'Sarga';
+
   isProcessing: boolean = false;
   isSaved: boolean = false;
   errorMessage: string = '';
@@ -216,5 +222,37 @@ export class SanskritTranslator implements OnInit {
   onTabChange(tab: 'TAMIL' | 'ENGLISH') {
     this.activeTab = tab;
     this.syncEditableFields();
+  }
+
+  toggleScriptureModal() {
+    this.showScriptureModal = !this.showScriptureModal;
+  }
+
+  addScripture() {
+    if (!this.newScriptureTitle.trim()) return;
+
+    const newBook: Partial<Scripture> = {
+      title: this.newScriptureTitle,
+      majorDivisionName: this.newMajorDivisionName,
+      minorDivisionName: this.newMinorDivisionName,
+      author: 'Unknown'
+    };
+
+    this.isProcessing = true;
+    this.scriptureService.create(newBook).subscribe({
+      next: (res) => {
+        this.loadScriptures();
+        this.selectedScripture = res;
+        this.newScriptureTitle = '';
+        this.showScriptureModal = false;
+        this.isProcessing = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to add new scripture.';
+        this.isProcessing = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
