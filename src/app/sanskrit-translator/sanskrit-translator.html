@@ -31,7 +31,12 @@
 
         <!-- Scripture Selection -->
         <div class="form-group">
-          <label>Select Book / Scripture</label>
+          <div class="label-with-action">
+            <label>Select Book / Scripture</label>
+            <button class="copy-btn" [class.copied]="copyStatus === 'scripture'" (click)="copyToClipboard(selectedScripture?.title || '', 'scripture')">
+              {{ copyStatus === 'scripture' ? 'Copied' : 'Copy' }}
+            </button>
+          </div>
           <select [(ngModel)]="selectedScripture" class="sloka-num-input" (change)="onScriptureChange()">
             @if (scriptures.length === 0) {
               <option [ngValue]="null" disabled selected>Loading scriptures...</option>
@@ -45,22 +50,42 @@
         @if (selectedScripture) {
           <div class="hierarchy-grid">
             <div class="form-group">
-              <label>{{selectedScripture.majorDivisionName}} No.</label>
+              <div class="label-with-action">
+                <label>{{selectedScripture.majorDivisionName}} No.</label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'major'" (click)="copyToClipboard(majorDivision?.toString() || '', 'major')">
+                  {{ copyStatus === 'major' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <input type="number" [(ngModel)]="majorDivision" placeholder="No." class="sloka-num-input">
             </div>
             <div class="form-group">
-              <label>{{selectedScripture.minorDivisionName}} No.</label>
+              <div class="label-with-action">
+                <label>{{selectedScripture.minorDivisionName}} No.</label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'minor'" (click)="copyToClipboard(minorDivision?.toString() || '', 'minor')">
+                  {{ copyStatus === 'minor' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <input type="number" [(ngModel)]="minorDivision" placeholder="No." class="sloka-num-input">
             </div>
             <div class="form-group">
-              <label>Verse No.</label>
+              <div class="label-with-action">
+                <label>Verse No.</label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'verse'" (click)="copyToClipboard(verseNumber?.toString() || '', 'verse')">
+                  {{ copyStatus === 'verse' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <input type="number" [(ngModel)]="verseNumber" placeholder="No." class="sloka-num-input">
             </div>
           </div>
         }
 
         <div class="form-group">
-          <label>Sanskrit Text</label>
+          <div class="label-with-action">
+            <label>Sanskrit Text</label>
+            <button class="copy-btn" [class.copied]="copyStatus === 'sanskrit'" (click)="copyToClipboard(sanskritText, 'sanskrit')">
+              {{ copyStatus === 'sanskrit' ? 'Copied' : 'Copy' }}
+            </button>
+          </div>
           <textarea 
             [(ngModel)]="sanskritText" 
             class="text-input" 
@@ -124,26 +149,46 @@
 
           <div class="result-sections animate-fade-in">
             <div class="section">
-              <label>
-                Transliteration 
-                <span class="lang-indicator">{{activeTab === 'TAMIL' ? 'Tamil' : 'IAST'}}</span>
-              </label>
+              <div class="label-with-action">
+                <label>
+                  Transliteration 
+                  <span class="lang-indicator">{{activeTab === 'TAMIL' ? 'Tamil' : 'IAST'}}</span>
+                </label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'transliteration'" (click)="copyToClipboard(editedTransliteration, 'transliteration')">
+                  {{ copyStatus === 'transliteration' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <textarea [(ngModel)]="editedTransliteration" class="tamil-text" rows="3" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
             
             <div class="section">
-              <label>Word-to-Word Meaning</label>
+              <div class="label-with-action">
+                <label>Word-to-Word Meaning</label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'word-to-word'" (click)="copyToClipboard(editedWordToWord, 'word-to-word')">
+                  {{ copyStatus === 'word-to-word' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <textarea [(ngModel)]="editedWordToWord" class="tamil-text" rows="6" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
 
             <div class="section">
-              <label>Translation</label>
+              <div class="label-with-action">
+                <label>Translation</label>
+                <button class="copy-btn" [class.copied]="copyStatus === 'translation'" (click)="copyToClipboard('Translation:\n' + editedTranslation, 'translation')">
+                  {{ copyStatus === 'translation' ? 'Copied' : 'Copy' }}
+                </button>
+              </div>
               <textarea [(ngModel)]="editedTranslation" class="tamil-text" rows="5" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
             </div>
 
             @if (includePurport) {
               <div class="section">
-                <label>Purport</label>
+                <div class="label-with-action">
+                  <label>Purport</label>
+                  <button class="copy-btn" [class.copied]="copyStatus === 'purport'" (click)="copyToClipboard(editedPurport, 'purport')">
+                    {{ copyStatus === 'purport' ? 'Copied' : 'Copy' }}
+                  </button>
+                </div>
                 <textarea [(ngModel)]="editedPurport" class="tamil-text" rows="10" [class.english-text]="activeTab === 'ENGLISH'"></textarea>
               </div>
             }
@@ -151,7 +196,10 @@
         }
       </div>
       @if (currentSloka) {
-        <div class="card-footer">
+        <div class="card-footer" style="gap: 1rem;">
+          <button (click)="copyAll()" class="secondary-btn" [disabled]="isProcessing">
+            {{ copyStatus === 'all' ? '✅ Copied All' : '📋 Copy All' }}
+          </button>
           <button (click)="onSave()" class="primary-btn" [disabled]="isProcessing">
             Save Approved {{activeTab | titlecase}} Version
           </button>

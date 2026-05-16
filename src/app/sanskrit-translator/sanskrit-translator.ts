@@ -52,6 +52,7 @@ export class SanskritTranslator implements OnInit {
 
   isProcessing: boolean = false;
   isSaved: boolean = false;
+  copyStatus: string | null = null;
   errorMessage: string = '';
 
   constructor(
@@ -254,5 +255,31 @@ export class SanskritTranslator implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  async copyToClipboard(text: string, fieldName: string) {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copyStatus = fieldName;
+      this.cdr.detectChanges();
+      
+      setTimeout(() => {
+        this.copyStatus = null;
+        this.cdr.detectChanges();
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      this.errorMessage = 'Failed to copy to clipboard.';
+      this.cdr.detectChanges();
+    }
+  }
+
+  async copyAll() {
+    if (!this.currentSloka) return;
+    
+    const fullText = `${this.sanskritText}\n\n${this.editedTransliteration}\n\n${this.editedWordToWord}\n\nTranslation:\n${this.editedTranslation}`;
+    
+    await this.copyToClipboard(fullText, 'all');
   }
 }

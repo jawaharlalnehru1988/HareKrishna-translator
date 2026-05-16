@@ -83,6 +83,48 @@
   }
 }
 
+.label-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  label {
+    margin-bottom: 0 !important;
+  }
+}
+
+.copy-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    background: #f8fafc;
+    border-color: #FF9933;
+    color: #FF9933;
+    transform: translateY(-1px);
+  }
+
+  &.copied {
+    background: #f0fdf4 !important;
+    border-color: #22c55e !important;
+    color: #16a34a !important;
+    transform: none !important;
+  }
+}
+
 .language-toggle {
   display: flex;
   background: #f1f5f9;
