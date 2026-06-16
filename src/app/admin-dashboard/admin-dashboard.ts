@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
@@ -24,7 +24,10 @@ export class AdminDashboard {
   feedbackMessage = '';
   feedbackStatus = '';
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
@@ -44,11 +47,19 @@ export class AdminDashboard {
         this.uploadMessage = res || 'Successfully ingested data into the AI model!';
         this.isUploading = false;
         this.selectedFile = null;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.uploadStatus = 'Error';
-        this.uploadMessage = err.error || 'Failed to upload Excel file.';
+        let errMsg = 'Failed to upload Excel file.';
+        if (typeof err.error === 'string') {
+          errMsg = err.error;
+        } else if (err.message) {
+          errMsg = err.message;
+        }
+        this.uploadMessage = errMsg;
         this.isUploading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -65,11 +76,19 @@ export class AdminDashboard {
         this.isSubmittingFeedback = false;
         this.feedbackEnglish = '';
         this.feedbackTamil = '';
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.feedbackStatus = 'Error';
-        this.feedbackMessage = err.error || 'Failed to submit feedback.';
+        let errMsg = 'Failed to submit feedback.';
+        if (typeof err.error === 'string') {
+          errMsg = err.error;
+        } else if (err.message) {
+          errMsg = err.message;
+        }
+        this.feedbackMessage = errMsg;
         this.isSubmittingFeedback = false;
+        this.cdr.detectChanges();
       }
     });
   }
