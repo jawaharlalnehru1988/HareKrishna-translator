@@ -43,4 +43,13 @@ export class TranslationService {
   updateCorrection(id: number, correctedText: string, approved: boolean): Observable<Translation> {
     return this.http.put<Translation>(`${this.apiUrl}/${id}`, { correctedText, approved });
   }
+
+  // New RAG-based AI translation endpoint
+  translateV1(sourceText: string): Observable<string> {
+    return this.http.post(
+      `${this.apiUrl}/v1/translate`, 
+      { sourceText },
+      { responseType: 'text' }
+    );
+  }
 }

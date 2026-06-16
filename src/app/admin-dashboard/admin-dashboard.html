@@ -1,0 +1,71 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>ISKCON Translator Admin</h1>
+    <p>Train the AI Translation Memory via Excel Ingestion or Manual Feedback.</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Excel Upload Card -->
+    <div class="card glass-card">
+      <h2><span class="icon">📤</span> Bulk Training (Excel Upload)</h2>
+      <p class="subtitle">Upload your translations sheet to embed them into the Vector DB.</p>
+      
+      <div class="form-group">
+        <label for="dataType">Data Type</label>
+        <select id="dataType" [(ngModel)]="uploadType">
+          <option value="SENTENCE">Sentence (A: English Sentence, B: Tamil Sentence)</option>
+          <option value="WORD">Word (A: English Word, B: Tamil Word)</option>
+          <option value="TRANSLITERATION">Transliteration (A: English Translit., B: Tamil Translit.)</option>
+        </select>
+      </div>
+
+      <div class="file-drop-area" (click)="fileInput.click()">
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx, .xls" hidden>
+        <div class="drop-text">
+          {{ selectedFile ? selectedFile.name : 'Click to select Excel file' }}
+        </div>
+      </div>
+
+      <button class="primary-btn" [disabled]="!selectedFile || isUploading" (click)="uploadExcel()">
+        {{ isUploading ? 'Uploading & Training...' : 'Start Training AI' }}
+      </button>
+
+      <div class="message" [class.success]="uploadStatus === 'Success'" [class.error]="uploadStatus === 'Error'" *ngIf="uploadMessage">
+        {{ uploadMessage }}
+      </div>
+    </div>
+
+    <!-- Manual Feedback Card -->
+    <div class="card glass-card">
+      <h2><span class="icon">✍️</span> Manual Correction</h2>
+      <p class="subtitle">Instantly fix a hallucination. The AI will learn this pair immediately.</p>
+
+      <div class="form-group">
+        <label>Feedback Type</label>
+        <select [(ngModel)]="feedbackType">
+          <option value="SENTENCE">Sentence Correction</option>
+          <option value="WORD">Vocabulary Correction</option>
+          <option value="TRANSLITERATION">Transliteration Correction</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>English Text</label>
+        <textarea [(ngModel)]="feedbackEnglish" placeholder="Enter the exact English string..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Corrected Tamil Text</label>
+        <textarea [(ngModel)]="feedbackTamil" placeholder="Enter the strictly correct Tamil equivalent..."></textarea>
+      </div>
+
+      <button class="primary-btn" [disabled]="!feedbackEnglish || !feedbackTamil || isSubmittingFeedback" (click)="submitFeedback()">
+        {{ isSubmittingFeedback ? 'Saving...' : 'Submit Correction' }}
+      </button>
+
+      <div class="message" [class.success]="feedbackStatus === 'Success'" [class.error]="feedbackStatus === 'Error'" *ngIf="feedbackMessage">
+        {{ feedbackMessage }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -57,7 +57,7 @@ export class Translator {
         this.cdr.detectChanges();
 
         const translatedBatch = await firstValueFrom(
-          this.translationService.translateBatch(batches[i], this.sourceLanguage, this.targetLanguage)
+          this.translationService.translateV1(batches[i])
         );
         
         fullTranslation += (fullTranslation ? '\n\n' : '') + translatedBatch;

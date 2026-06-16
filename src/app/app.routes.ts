@@ -4,6 +4,7 @@ import { Translator } from './translator/translator';
 import { SanskritTranslator } from './sanskrit-translator/sanskrit-translator';
 import { Home } from './home/home';
 import { History } from './history/history';
+import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'sanskrit-tamil', redirectTo: 'sanskrit' },
   { path: 'sanskrit-english', redirectTo: 'sanskrit' },
   { path: 'corrector', component: TranslationCorrector },
-  { path: 'history', component: History }
+  { path: 'history', component: History },
+  { path: 'admin', component: AdminDashboard }
 ];
