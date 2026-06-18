@@ -38,6 +38,27 @@ export class Home {
       route: '/history',
       icon: '📚',
       color: '#6B7280'
+    },
+    {
+      title: 'Context Extractor',
+      description: 'Extract Bhagavad Gita slokas and purports directly from Vedabase URLs.',
+      route: '/extractor',
+      icon: '🔍',
+      color: '#06B6D4'
+    },
+    {
+      title: 'Train the Translator',
+      description: 'Manage translations, users, and system configuration.',
+      route: '/admin',
+      icon: '⚙️',
+      color: '#8B5CF6'
+    },
+    {
+      title: 'Ramayana Extractor',
+      description: 'Extract and generate English/Tamil context for Ramayana slokas from WisdomLib.',
+      route: '/ramayana-extractor',
+      icon: '🏹',
+      color: '#EAB308'
     }
   ];
 }

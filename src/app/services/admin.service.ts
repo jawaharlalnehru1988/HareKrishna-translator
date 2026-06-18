@@ -26,4 +26,22 @@ export class AdminService {
       { responseType: 'text' }
     );
   }
+
+  extractContext(url: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/scraper/extract`, { url });
+  }
+
+  translateContextToTamil(context: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/scraper/translate-tamil`, context);
+  }
+
+  generateRamayanaEnglish(context: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/scraper/generate-ramayana`, context);
+  }
+
+  saveRamayana(context: any): Observable<any> {
+    // Note: URL doesn't use the /admin prefix if we set it up differently in RamayanaController.
+    // Let's verify: RamayanaController is mapped to /api/v1/ramayana and has /admin/save
+    return this.http.post(`${environment.apiUrl}/v1/ramayana/admin/save`, context);
+  }
 }
