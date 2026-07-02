@@ -11,10 +11,22 @@
         </div>
 
         <div class="nav-links" [class.active]="isMenuOpen">
-            <a routerLink="/home" class="nav-link" routerLinkActive="active"
-                [routerLinkActiveOptions]="{exact: true}">Home</a>
-            <a routerLink="/history" class="nav-link" routerLinkActive="active">History</a>
-            <button class="primary-btn login-btn">Login</button>
+            <a routerLink="/books" class="nav-link" routerLinkActive="active">Books</a>
+            
+            <ng-container *ngIf="isAuthenticated">
+              <a routerLink="/home" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+              
+              <a *ngIf="isAdmin" routerLink="/admin" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">AI Training</a>
+              <a *ngIf="isAdmin" routerLink="/admin/users" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Users</a>
+
+              <span class="nav-text">Welcome, {{ username }}</span>
+              <button class="primary-btn login-btn" (click)="logout()">Logout</button>
+            </ng-container>
+
+            <ng-container *ngIf="!isAuthenticated">
+              <button class="primary-btn login-btn" routerLink="/login">Login</button>
+              <button class="secondary-btn" routerLink="/signup" style="margin-left: 10px;">Sign Up</button>
+            </ng-container>
         </div>
 
         <div class="mobile-toggle" (click)="toggleMenu()">

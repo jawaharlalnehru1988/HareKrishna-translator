@@ -1,45 +1,49 @@
 <div class="context-extractor-card">
   <h2>Ramayana Extractor (WisdomLib Bypass)</h2>
-  
+
   <div class="row">
     <div class="col">
       <div class="form-group">
         <label>Paste Raw WisdomLib Content (Sanskrit + Transliteration)</label>
-        <textarea rows="6" [(ngModel)]="rawWisdomlibText" placeholder="Paste the text here..."></textarea>
+        <textarea
+          rows="6"
+          [(ngModel)]="rawWisdomlibText"
+          placeholder="Paste the text here..."
+        ></textarea>
       </div>
       <button class="btn btn-primary" (click)="extractFromRawText()">Extract Sloka</button>
     </div>
   </div>
 
-  <div class="row" style="margin-top: 20px;">
+  <div class="row" style="margin-top: 20px">
     <!-- English Side -->
     <div class="col half">
       <h3>English Context</h3>
-      
-      <div class="url-group" style="margin-bottom: 15px; display: flex; gap: 10px;">
-        <div class="form-group" style="flex: 2;">
+
+      <div class="url-group" style="margin-bottom: 15px; display: flex; gap: 10px">
+        <div class="form-group" style="flex: 2">
           <label>Canto Name</label>
-          <input type="text" [(ngModel)]="cantoName" placeholder="e.g. Bala Kanda">
+          <input type="text" [(ngModel)]="cantoName" placeholder="e.g. Bala Kanda" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Canto No.</label>
-          <input type="number" [(ngModel)]="cantoNumber">
+          <input type="number" [(ngModel)]="cantoNumber" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Chapter No.</label>
-          <input type="number" [(ngModel)]="chapterNumber">
+          <input type="number" [(ngModel)]="chapterNumber" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Verse No.</label>
-          <input type="number" [(ngModel)]="verseNumber">
+          <input type="number" [(ngModel)]="verseNumber" />
         </div>
       </div>
-      
+
       <div class="form-group">
         <label>Computed Sloka Number</label>
-        <input type="text" [value]="slokaNumber" readonly style="background: #f3f4f6;">
+        <input type="text" [value]="slokaNumber" readonly style="background: #f3f4f6" />
       </div>
-      
+
       <div class="form-group">
         <label>Sanskrit Sloka</label>
         <textarea rows="3" [(ngModel)]="sanskritSloka" readonly></textarea>
@@ -50,15 +54,15 @@
       </div>
       <div class="form-group">
         <label>
-          <input type="checkbox" [(ngModel)]="generatePurport"> Generate Purport (Optional)
+          <input type="checkbox" [(ngModel)]="generatePurport" /> Generate Purport (Optional)
         </label>
       </div>
-      
+
       <button class="btn btn-warning" (click)="generateEnglish()" [disabled]="isGeneratingEnglish">
         {{ isGeneratingEnglish ? 'Generating...' : 'Generate English Content' }}
       </button>
 
-      <div class="form-group" style="margin-top: 15px;">
+      <div class="form-group" style="margin-top: 15px">
         <label>Word to Word Meaning (English)</label>
         <textarea rows="3" [(ngModel)]="wordToWordMeaning"></textarea>
       </div>
@@ -66,12 +70,19 @@
         <label>Translation (English)</label>
         <textarea rows="4" [(ngModel)]="translation"></textarea>
       </div>
-      <div class="form-group" *ngIf="generatePurport">
-        <label>Purport (English)</label>
-        <textarea rows="6" [(ngModel)]="purport"></textarea>
-      </div>
-      
-      <button class="btn btn-success" (click)="translateToTamil()" [disabled]="isTranslatingTamil || !translation" style="margin-top: 10px;">
+      @if (generatePurport) {
+        <div class="form-group">
+          <label>Purport (English)</label>
+          <textarea rows="6" [(ngModel)]="purport"></textarea>
+        </div>
+      }
+
+      <button
+        class="btn btn-success"
+        (click)="translateToTamil()"
+        [disabled]="isTranslatingTamil || !translation"
+        style="margin-top: 10px"
+      >
         {{ isTranslatingTamil ? 'Translating...' : 'Translate to Tamil' }}
       </button>
     </div>
@@ -79,27 +90,32 @@
     <!-- Tamil Side -->
     <div class="col half">
       <h3>Tamil Context</h3>
-      <div class="url-group" style="margin-bottom: 15px; display: flex; gap: 10px;">
-        <div class="form-group" style="flex: 2;">
+      <div class="url-group" style="margin-bottom: 15px; display: flex; gap: 10px">
+        <div class="form-group" style="flex: 2">
           <label>Canto Name (Tamil)</label>
-          <input type="text" [(ngModel)]="tamilCantoName" placeholder="e.g. பால காண்டம்">
+          <input type="text" [(ngModel)]="tamilCantoName" placeholder="e.g. பால காண்டம்" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Canto No.</label>
-          <input type="number" [(ngModel)]="cantoNumber" readonly style="background: #f3f4f6;">
+          <input type="number" [(ngModel)]="cantoNumber" readonly style="background: #f3f4f6" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Chapter No.</label>
-          <input type="number" [(ngModel)]="chapterNumber" readonly style="background: #f3f4f6;">
+          <input type="number" [(ngModel)]="chapterNumber" readonly style="background: #f3f4f6" />
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group" style="flex: 1">
           <label>Verse No.</label>
-          <input type="number" [(ngModel)]="verseNumber" readonly style="background: #f3f4f6;">
+          <input type="number" [(ngModel)]="verseNumber" readonly style="background: #f3f4f6" />
         </div>
       </div>
       <div class="form-group">
         <label>Computed Sloka Number (Tamil)</label>
-        <input type="text" [value]="tamilSlokaNumberComputed" readonly style="background: #f3f4f6;">
+        <input
+          type="text"
+          [value]="tamilSlokaNumberComputed"
+          readonly
+          style="background: #f3f4f6"
+        />
       </div>
       <div class="form-group">
         <label>Sanskrit Sloka</label>
@@ -117,18 +133,26 @@
         <label>Translation (Tamil)</label>
         <textarea rows="4" [(ngModel)]="tamilTranslation"></textarea>
       </div>
-      <div class="form-group" *ngIf="generatePurport">
-        <label>Purport (Tamil)</label>
-        <textarea rows="6" [(ngModel)]="tamilPurport"></textarea>
-      </div>
+      @if (generatePurport) {
+        <div class="form-group">
+          <label>Purport (Tamil)</label>
+          <textarea rows="6" [(ngModel)]="tamilPurport"></textarea>
+        </div>
+      }
 
-      <button class="btn btn-primary" (click)="saveToDatabase()" style="margin-top: 10px; width: 100%;">
+      <button
+        class="btn btn-primary"
+        (click)="saveToDatabase()"
+        style="margin-top: 10px; width: 100%"
+      >
         Save Context to Database
       </button>
     </div>
   </div>
 
-  <div *ngIf="statusMessage" class="status-message" [ngClass]="{'error': isError, 'success': !isError}">
-    {{ statusMessage }}
-  </div>
+  @if (statusMessage) {
+    <div class="status-message" [ngClass]="{ error: isError, success: !isError }">
+      {{ statusMessage }}
+    </div>
+  }
 </div>

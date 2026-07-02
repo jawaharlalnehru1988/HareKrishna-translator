@@ -2,33 +2,67 @@
   <h2><span class="icon">🔍</span> Vedabase Context Extractor</h2>
   <p class="subtitle">Enter a Vedabase.io URL to extract the sloka details automatically.</p>
 
-  <div class="form-group builder-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-    <div style="flex: 2; min-width: 150px;">
-      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block;">Source</label>
-      <select [(ngModel)]="selectedSource" class="sloka-num-input" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px;">
-        <option *ngFor="let src of sources" [ngValue]="src">{{src.name}}</option>
+  <div class="form-group builder-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+    <div style="flex: 2; min-width: 150px">
+      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block"
+        >Source</label
+      >
+      <select
+        [(ngModel)]="selectedSource"
+        class="sloka-num-input"
+        style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px"
+      >
+        @for (src of sources; track src) {
+          <option [ngValue]="src">{{ src.name }}</option>
+        }
       </select>
     </div>
-    
-    <div style="flex: 1; min-width: 100px;">
-      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block;">Book Code</label>
-      <input type="text" [(ngModel)]="bookCode" placeholder="e.g. bg" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px;">
+
+    <div style="flex: 1; min-width: 100px">
+      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block"
+        >Book Code</label
+      >
+      <input
+        type="text"
+        [(ngModel)]="bookCode"
+        placeholder="e.g. bg"
+        style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px"
+      />
     </div>
-    
-    <div style="flex: 1; min-width: 80px;">
-      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block;">Chapter</label>
-      <input type="number" [(ngModel)]="chapterNum" placeholder="No." style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px;">
+
+    <div style="flex: 1; min-width: 80px">
+      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block"
+        >Chapter</label
+      >
+      <input
+        type="number"
+        [(ngModel)]="chapterNum"
+        placeholder="No."
+        style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px"
+      />
     </div>
-    
-    <div style="flex: 1; min-width: 80px;">
-      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block;">Sloka</label>
-      <input type="number" [(ngModel)]="slokaNum" placeholder="No." style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px;">
+
+    <div style="flex: 1; min-width: 80px">
+      <label style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; display: block"
+        >Sloka</label
+      >
+      <input
+        type="number"
+        [(ngModel)]="slokaNum"
+        placeholder="No."
+        style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px"
+      />
     </div>
   </div>
 
-  <div class="form-group url-group" style="margin-top: 1rem;">
-    <input type="text" [value]="constructedUrl" readonly style="background-color: #f3f4f6; color: #6b7280;">
-    <div style="display: flex; gap: 0.5rem;">
+  <div class="form-group url-group" style="margin-top: 1rem">
+    <input
+      type="text"
+      [value]="constructedUrl"
+      readonly
+      style="background-color: #f3f4f6; color: #6b7280"
+    />
+    <div style="display: flex; gap: 0.5rem">
       <button class="primary-btn" [disabled]="isLoading" (click)="fetchContext()">
         {{ isLoading ? 'Fetching...' : 'Extract Content' }}
       </button>
@@ -38,86 +72,110 @@
     </div>
   </div>
 
-  <div class="message" [class.success]="!isError" [class.error]="isError" *ngIf="statusMessage">
-    {{ statusMessage }}
-  </div>
+  @if (statusMessage) {
+    <div class="message" [class.success]="!isError" [class.error]="isError">
+      {{ statusMessage }}
+    </div>
+  }
 
   <div class="extracted-data">
     <div class="english-section">
-      <h3 style="margin-bottom: 1rem; color: #4F46E5; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">English Extracted Context</h3>
+      <h3
+        style="
+          margin-bottom: 1rem;
+          color: #4f46e5;
+          border-bottom: 1px solid #e5e7eb;
+          padding-bottom: 0.5rem;
+        "
+      >
+        English Extracted Context
+      </h3>
       <div class="form-group">
-      <label>Sloka Number</label>
-      <input type="text" [(ngModel)]="slokaNumber">
-    </div>
-
-    <div class="form-group">
-      <label>Sanskrit Sloka</label>
-      <textarea rows="3" [(ngModel)]="sanskritSloka"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Transliteration</label>
-      <textarea rows="3" [(ngModel)]="slokaTransliteration"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Word to Word Meaning</label>
-      <textarea rows="4" [(ngModel)]="wordToWordMeaning"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Translation</label>
-      <textarea rows="4" [(ngModel)]="translation"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Purport</label>
-      <textarea rows="10" [(ngModel)]="purport"></textarea>
-    </div>
-
-    </div> <!-- End English Section -->
-
-    <div class="actions translation-actions" style="margin-top: 1rem; margin-bottom: 2rem;">
-      <button class="secondary-btn" (click)="translateToTamil()" [disabled]="isTranslating || (!slokaNumber && !sanskritSloka)">
-        <span class="icon">🌐</span> {{ isTranslating ? 'Translating to Tamil...' : 'Translate to Tamil ⬇' }}
-      </button>
-    </div>
-
-    <div class="tamil-section" *ngIf="tamilSlokaNumber || tamilSlokaTransliteration || tamilWordToWordMeaning || isTranslating">
-      <h3 style="margin-bottom: 1rem; color: #10B981; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">Tamil Translated Context</h3>
-      
-      <div class="form-group">
-        <label>Sloka Number (Tamil)</label>
-        <input type="text" [(ngModel)]="tamilSlokaNumber">
+        <label>Sloka Number</label>
+        <input type="text" [(ngModel)]="slokaNumber" />
       </div>
 
       <div class="form-group">
         <label>Sanskrit Sloka</label>
-        <textarea rows="3" [(ngModel)]="tamilSanskritSloka"></textarea>
+        <textarea rows="3" [(ngModel)]="sanskritSloka"></textarea>
       </div>
 
       <div class="form-group">
-        <label>Transliteration (Tamil)</label>
-        <textarea rows="3" [(ngModel)]="tamilSlokaTransliteration"></textarea>
+        <label>Transliteration</label>
+        <textarea rows="3" [(ngModel)]="slokaTransliteration"></textarea>
       </div>
 
       <div class="form-group">
-        <label>Word to Word Meaning (Tamil)</label>
-        <textarea rows="4" [(ngModel)]="tamilWordToWordMeaning"></textarea>
+        <label>Word to Word Meaning</label>
+        <textarea rows="4" [(ngModel)]="wordToWordMeaning"></textarea>
       </div>
 
       <div class="form-group">
-        <label>Translation (Tamil)</label>
-        <textarea rows="4" [(ngModel)]="tamilTranslation"></textarea>
+        <label>Translation</label>
+        <textarea rows="4" [(ngModel)]="translation"></textarea>
       </div>
 
       <div class="form-group">
-        <label>Purport (Tamil)</label>
-        <textarea rows="10" [(ngModel)]="tamilPurport"></textarea>
+        <label>Purport</label>
+        <textarea rows="10" [(ngModel)]="purport"></textarea>
       </div>
     </div>
+    <!-- End English Section -->
 
-    <div class="actions final-actions" style="margin-top: 2rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+    <div class="actions translation-actions" style="margin-top: 1rem; margin-bottom: 2rem">
+      <button
+        class="secondary-btn"
+        (click)="translateToTamil()"
+        [disabled]="isTranslating || (!slokaNumber && !sanskritSloka)"
+      >
+        <span class="icon">🌐</span>
+        {{ isTranslating ? 'Translating to Tamil...' : 'Translate to Tamil ⬇' }}
+      </button>
+    </div>
+
+    @if (tamilSlokaNumber || tamilSlokaTransliteration || tamilWordToWordMeaning || isTranslating) {
+      <div class="tamil-section">
+        <h3
+          style="
+            margin-bottom: 1rem;
+            color: #10b981;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+          "
+        >
+          Tamil Translated Context
+        </h3>
+        <div class="form-group">
+          <label>Sloka Number (Tamil)</label>
+          <input type="text" [(ngModel)]="tamilSlokaNumber" />
+        </div>
+        <div class="form-group">
+          <label>Sanskrit Sloka</label>
+          <textarea rows="3" [(ngModel)]="tamilSanskritSloka"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Transliteration (Tamil)</label>
+          <textarea rows="3" [(ngModel)]="tamilSlokaTransliteration"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Word to Word Meaning (Tamil)</label>
+          <textarea rows="4" [(ngModel)]="tamilWordToWordMeaning"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Translation (Tamil)</label>
+          <textarea rows="4" [(ngModel)]="tamilTranslation"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Purport (Tamil)</label>
+          <textarea rows="10" [(ngModel)]="tamilPurport"></textarea>
+        </div>
+      </div>
+    }
+
+    <div
+      class="actions final-actions"
+      style="margin-top: 2rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem"
+    >
       <button class="primary-btn save-btn" (click)="saveToDatabase()">
         <span class="icon">💾</span> Save Context to Database
       </button>

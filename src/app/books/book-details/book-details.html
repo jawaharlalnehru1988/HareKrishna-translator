@@ -1,0 +1,116 @@
+<div class="book-details-container">
+  <header class="page-header">
+    <h1 class="title">{{ bookTitle | titlecase }}</h1>
+    <p class="subtitle">Language: <span class="lang-badge">{{ language | titlecase }}</span></p>
+  </header>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loader"></div>
+    <p>Loading {{ bookTitle | titlecase }}...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- RAMAYANA VIEW -->
+    <div *ngIf="bookTitle.toLowerCase() === 'ramayana'" class="accordion-container">
+      <div *ngFor="let canto of ramayanaToc" class="canto-card animate-fade-in">
+        <div class="canto-header" (click)="toggleCanto(canto.cantoNumber)">
+          <h2>Canto {{ canto.cantoNumber }}: {{ language === 'tamil' && canto.cantoNameTa ? canto.cantoNameTa : canto.cantoName }}</h2>
+          <span class="icon">{{ expandedCanto === canto.cantoNumber ? '▼' : '▶' }}</span>
+        </div>
+        
+        <div *ngIf="expandedCanto === canto.cantoNumber" class="canto-content">
+          <div *ngFor="let chapter of canto.chapters" class="chapter-card">
+            <div class="chapter-header" (click)="toggleChapter(chapter.chapterNumber)">
+              <h3>Chapter {{ chapter.chapterNumber }}</h3>
+              <span class="icon">{{ expandedChapter === chapter.chapterNumber ? '▼' : '▶' }}</span>
+            </div>
+            
+            <div *ngIf="expandedChapter === chapter.chapterNumber" class="chapter-content">
+              <div *ngFor="let verseNum of chapter.verses" class="verse-row">
+                <div class="verse-header" (click)="toggleVerse(canto.cantoNumber, chapter.chapterNumber, verseNum)">
+                  <h4>Verse {{ verseNum }}</h4>
+                  <span class="icon">{{ slokaDetails[getSlokaKey(canto.cantoNumber, chapter.chapterNumber, verseNum)] ? '▼' : '▶' }}</span>
+                </div>
+                
+                <div *ngIf="slokaDetails[getSlokaKey(canto.cantoNumber, chapter.chapterNumber, verseNum)] as details" class="verse-details">
+                  <div *ngIf="details.loading" class="small-loader">Loading...</div>
+                  <div *ngIf="!details.loading && !details.error">
+                    <div class="data-group">
+                      <label>Sanskrit</label>
+                      <p class="sanskrit-text">{{ details.sanskritSloka }}</p>
+                    </div>
+                    <div class="data-group" *ngIf="details.transliteration">
+                      <label>Transliteration</label>
+                      <p class="transliteration-text">{{ details.transliteration }}</p>
+                    </div>
+                    <div class="data-group" *ngIf="details.wordToWordMeaning">
+                      <label>Word to Word Meaning</label>
+                      <p>{{ details.wordToWordMeaning }}</p>
+                    </div>
+                    <div class="data-group">
+                      <label>Translation</label>
+                      <p>{{ details.translation }}</p>
+                    </div>
+                    <div class="data-group" *ngIf="details.purport">
+                      <label>Purport</label>
+                      <p>{{ details.purport }}</p>
+                    </div>
+                  </div>
+                  <div *ngIf="details.error" class="error-msg">{{ details.error }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="ramayanaToc.length === 0" class="empty-state">
+        <p>No Ramayana slokas found.</p>
+      </div>
+    </div>
+
+    <!-- GENERIC VIEW (e.g. Bhagavad Gita) -->
+    <div *ngIf="bookTitle.toLowerCase() !== 'ramayana'" class="accordion-container">
+      <div *ngFor="let chapterNum of chapterKeys" class="canto-card animate-fade-in">
+        <div class="canto-header" (click)="toggleGenericChapter(chapterNum)">
+          <h2>Chapter {{ chapterNum }}</h2>
+          <span class="icon">{{ expandedGenericChapter === chapterNum ? '▼' : '▶' }}</span>
+        </div>
+        
+        <div *ngIf="expandedGenericChapter === chapterNum" class="canto-content">
+          <div *ngFor="let sloka of genericSlokasByChapter[chapterNum]" class="verse-row" style="margin-top: 10px; border: 1px solid #eee; border-radius: 8px;">
+            <div class="verse-header" style="background: transparent;">
+              <h4>Verse {{ sloka.verseNumber }}</h4>
+            </div>
+            <div class="verse-details" style="display: block; padding-top: 0;">
+              <div class="data-group">
+                <label>Sanskrit</label>
+                <p class="sanskrit-text">{{ sloka.sanskritText }}</p>
+              </div>
+              <div class="data-group" *ngIf="language === 'tamil' ? sloka.transliteration : sloka.transliterationEn">
+                <label>Transliteration</label>
+                <p class="transliteration-text">{{ language === 'tamil' ? sloka.transliteration : sloka.transliterationEn }}</p>
+              </div>
+              <div class="data-group" *ngIf="language === 'tamil' ? sloka.wordToWordMeaning : sloka.wordToWordMeaningEn">
+                <label>Word to Word Meaning</label>
+                <p>{{ language === 'tamil' ? sloka.wordToWordMeaning : sloka.wordToWordMeaningEn }}</p>
+              </div>
+              <div class="data-group">
+                <label>Translation</label>
+                <p>{{ language === 'tamil' ? sloka.translation : sloka.translationEn }}</p>
+              </div>
+              <div class="data-group" *ngIf="language === 'tamil' ? sloka.purport : sloka.purportEn">
+                <label>Purport</label>
+                <p>{{ language === 'tamil' ? sloka.purport : sloka.purportEn }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="chapterKeys.length === 0" class="empty-state">
+        <p>No slokas found for {{ bookTitle | titlecase }}.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,23 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RamayanaService } from '../services/ramayana.service';
 
 @Component({
   selector: 'app-ramayana-reader',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './ramayana-reader.html',
-  styleUrls: ['./ramayana-reader.scss']
+  styleUrls: ['./ramayana-reader.scss'],
 })
 export class RamayanaReaderComponent implements OnInit {
   language: 'english' | 'tamil' = 'english';
-  
+
   toc: any[] = [];
   selectedCanto: any = null;
   selectedChapter: any = null;
   selectedVerse: number | null = null;
-  
+
   currentSloka: any = null;
   loading: boolean = false;
   error: string = '';
@@ -39,12 +39,16 @@ export class RamayanaReaderComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Failed to load table of contents.';
-      }
+      },
     });
   }
 
   onCantoChange() {
-    if (this.selectedCanto && this.selectedCanto.chapters && this.selectedCanto.chapters.length > 0) {
+    if (
+      this.selectedCanto &&
+      this.selectedCanto.chapters &&
+      this.selectedCanto.chapters.length > 0
+    ) {
       this.selectedChapter = this.selectedCanto.chapters[0];
       this.onChapterChange();
     } else {
@@ -55,7 +59,11 @@ export class RamayanaReaderComponent implements OnInit {
   }
 
   onChapterChange() {
-    if (this.selectedChapter && this.selectedChapter.verses && this.selectedChapter.verses.length > 0) {
+    if (
+      this.selectedChapter &&
+      this.selectedChapter.verses &&
+      this.selectedChapter.verses.length > 0
+    ) {
       this.selectedVerse = this.selectedChapter.verses[0];
       this.fetchSloka();
     } else {
@@ -77,25 +85,27 @@ export class RamayanaReaderComponent implements OnInit {
 
   fetchSloka() {
     if (!this.selectedCanto || !this.selectedChapter || !this.selectedVerse) return;
-    
+
     this.loading = true;
     this.error = '';
-    
-    this.ramayanaService.getSloka(
-      this.language, 
-      this.selectedCanto.cantoNumber, 
-      this.selectedChapter.chapterNumber, 
-      this.selectedVerse
-    ).subscribe({
-      next: (res) => {
-        this.currentSloka = res;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to fetch the sloka. It may not exist in the selected language.';
-        this.currentSloka = null;
-        this.loading = false;
-      }
-    });
+
+    this.ramayanaService
+      .getSloka(
+        this.language,
+        this.selectedCanto.cantoNumber,
+        this.selectedChapter.chapterNumber,
+        this.selectedVerse,
+      )
+      .subscribe({
+        next: (res) => {
+          this.currentSloka = res;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = 'Failed to fetch the sloka. It may not exist in the selected language.';
+          this.currentSloka = null;
+          this.loading = false;
+        },
+      });
   }
 }

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { TranslationService, Translation } from '../services/translation.service';
 import { firstValueFrom } from 'rxjs';
@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-translator',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './translator.html',
   styleUrl: './translator.scss',
 })
@@ -17,7 +17,7 @@ export class Translator {
   correctedText: string = '';
   sourceLanguage: string = 'English';
   targetLanguage: string = 'Tamil';
-  
+
   sourceLanguages: string[] = ['English', 'Sanskrit', 'Bengali'];
   targetLanguages: string[] = ['Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Hindi'];
 
@@ -25,7 +25,7 @@ export class Translator {
   isProcessing: boolean = false;
   progressPercentage: number = 0;
   progressMessage: string = '';
-  
+
   isCorrected: boolean = false;
   isCopied: boolean = false;
   errorMessage: string = '';
@@ -34,12 +34,12 @@ export class Translator {
 
   constructor(
     private translationService: TranslationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   async onTranslate() {
     if (!this.sourceText.trim()) return;
-    
+
     this.isProcessing = true;
     this.errorMessage = '';
     this.currentTranslation = null;
@@ -53,13 +53,13 @@ export class Translator {
 
       for (let i = 0; i < batches.length; i++) {
         this.progressMessage = `Translating Part ${i + 1} of ${batches.length}...`;
-        this.progressPercentage = Math.round(((i) / batches.length) * 100);
+        this.progressPercentage = Math.round((i / batches.length) * 100);
         this.cdr.detectChanges();
 
         const translatedBatch = await firstValueFrom(
-          this.translationService.translateV1(batches[i])
+          this.translationService.translateV1(batches[i]),
         );
-        
+
         fullTranslation += (fullTranslation ? '\n\n' : '') + translatedBatch;
       }
 
@@ -73,7 +73,7 @@ export class Translator {
         translatedText: fullTranslation,
         sourceLanguage: this.sourceLanguage,
         targetLanguage: this.targetLanguage,
-        approved: false
+        approved: false,
       };
 
       this.translationService.saveFinal(finalObj).subscribe({
@@ -88,9 +88,8 @@ export class Translator {
           this.errorMessage = 'Translation complete, but failed to save to history.';
           this.isProcessing = false;
           this.cdr.detectChanges();
-        }
+        },
       });
-
     } catch (err) {
       console.error('Translation failed', err);
       this.errorMessage = 'Translation failed during processing. Please check your connection.';
@@ -105,11 +104,11 @@ export class Translator {
     let currentBatch = '';
 
     for (const para of paragraphs) {
-      if ((currentBatch.length + para.length + 2) <= this.batchLimit) {
+      if (currentBatch.length + para.length + 2 <= this.batchLimit) {
         currentBatch += (currentBatch ? '\n\n' : '') + para;
       } else {
         if (currentBatch) batches.push(currentBatch);
-        
+
         // If a single paragraph is larger than the limit, we must split it by sentences
         if (para.length > this.batchLimit) {
           const subBatches = this.splitLargeParagraph(para);
@@ -130,7 +129,7 @@ export class Translator {
     let currentSub = '';
 
     for (const sent of sentences) {
-      if ((currentSub.length + sent.length) <= this.batchLimit) {
+      if (currentSub.length + sent.length <= this.batchLimit) {
         currentSub += sent;
       } else {
         if (currentSub) subBatches.push(currentSub);
@@ -143,37 +142,35 @@ export class Translator {
 
   onSaveCorrection(approved: boolean = false) {
     if (!this.currentTranslation?.id) return;
-    
+
     this.isProcessing = true;
     this.cdr.detectChanges();
-    this.translationService.updateCorrection(
-      this.currentTranslation.id, 
-      this.correctedText, 
-      approved
-    ).subscribe({
-      next: (res) => {
-        this.currentTranslation = res;
-        this.isCorrected = true;
-        this.isProcessing = false;
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          this.isCorrected = false;
+    this.translationService
+      .updateCorrection(this.currentTranslation.id, this.correctedText, approved)
+      .subscribe({
+        next: (res) => {
+          this.currentTranslation = res;
+          this.isCorrected = true;
+          this.isProcessing = false;
           this.cdr.detectChanges();
-        }, 3000);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to save correction.';
-        this.isProcessing = false;
-        this.cdr.detectChanges();
-      }
-    });
+          setTimeout(() => {
+            this.isCorrected = false;
+            this.cdr.detectChanges();
+          }, 3000);
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to save correction.';
+          this.isProcessing = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onCopy() {
     if (!this.correctedText) return;
     navigator.clipboard.writeText(this.correctedText).then(() => {
       this.isCopied = true;
-      setTimeout(() => this.isCopied = false, 2000);
+      setTimeout(() => (this.isCopied = false), 2000);
     });
   }
 

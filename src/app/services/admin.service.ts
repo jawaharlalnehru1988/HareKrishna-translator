@@ -11,18 +11,23 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  uploadExcel(file: File, type: string): Observable<string> {
+  uploadExcel(file: File, type: string, scripture: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
+    formData.append('scripture', scripture);
 
-    return this.http.post(`${this.apiUrl}/upload-excel`, formData, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/upload-excel`, formData);
   }
 
-  submitFeedback(englishText: string, correctedTamilText: string, type: string): Observable<string> {
+  getUploadStatus(jobId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/upload-status/${jobId}`);
+  }
+
+  submitFeedback(englishText: string, correctedTamilText: string, type: string, scriptureContext: string): Observable<string> {
     return this.http.post(
       `${this.apiUrl}/feedback`, 
-      { englishText, correctedTamilText, type },
+      { englishText, correctedTamilText, type, scriptureContext },
       { responseType: 'text' }
     );
   }

@@ -1,0 +1,21 @@
+<div class="auth-container">
+  <div class="auth-card glass-card">
+    <h2>Login</h2>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" [(ngModel)]="username" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="password-wrapper">
+        <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" class="form-control" />
+        <button class="eye-icon" (click)="togglePasswordVisibility()">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
+    </div>
+    <button (click)="login()" class="primary-btn">Login</button>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+    <p>Don't have an account? <a routerLink="/signup">Sign up</a></p>
+  </div>
+</div>

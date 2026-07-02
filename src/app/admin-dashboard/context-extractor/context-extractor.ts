@@ -1,14 +1,14 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-context-extractor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './context-extractor.html',
-  styleUrls: ['./context-extractor.scss']
+  styleUrls: ['./context-extractor.scss'],
 })
 export class ContextExtractor {
   url: string = '';
@@ -19,7 +19,7 @@ export class ContextExtractor {
 
   sources = [
     { name: 'Vedabase', baseUrl: 'https://vedabase.io/en/library/' },
-    { name: 'Prabhupada.io', baseUrl: 'https://prabhupada.io/' }
+    { name: 'Prabhupada.io', baseUrl: 'https://prabhupada.io/' },
   ];
   selectedSource = this.sources[1]; // Set Prabhupada.io as default
   bookCode = 'bg';
@@ -47,7 +47,7 @@ export class ContextExtractor {
 
   constructor(
     private adminService: AdminService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   fetchContext() {
@@ -64,7 +64,7 @@ export class ContextExtractor {
         this.statusMessage = err.error?.error || 'Failed to extract context.';
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -75,10 +75,10 @@ export class ContextExtractor {
     this.wordToWordMeaning = res.wordToWordMeaning || '';
     this.translation = res.translation || '';
     this.purport = res.purport || '';
-    
+
     this.statusMessage = 'Context successfully extracted!';
     this.isLoading = false;
-    
+
     // Clear Tamil fields on new extraction
     this.tamilSlokaNumber = '';
     this.tamilSanskritSloka = '';
@@ -86,14 +86,14 @@ export class ContextExtractor {
     this.tamilWordToWordMeaning = '';
     this.tamilTranslation = '';
     this.tamilPurport = '';
-    
+
     this.cdr.detectChanges();
   }
 
   fetchNextSloka() {
     this.slokaNum++;
     this.url = this.constructedUrl;
-    
+
     this.isLoading = true;
     this.statusMessage = `Fetching next sloka: ${this.chapterNum}.${this.slokaNum}...`;
     this.isError = false;
@@ -106,25 +106,25 @@ export class ContextExtractor {
         this.chapterNum++;
         this.slokaNum = 1;
         this.url = this.constructedUrl;
-        
+
         this.statusMessage = `Chapter ended. Fetching next chapter: ${this.chapterNum}.${this.slokaNum}...`;
         this.cdr.detectChanges();
-        
+
         this.adminService.extractContext(this.url).subscribe({
-           next: (res2: any) => this.updateFields(res2),
-           error: (err2: any) => {
-               this.isError = true;
-               this.statusMessage = 'Failed to fetch next chapter. End of book?';
-               this.isLoading = false;
-               this.cdr.detectChanges();
-           }
+          next: (res2: any) => this.updateFields(res2),
+          error: (err2: any) => {
+            this.isError = true;
+            this.statusMessage = 'Failed to fetch next chapter. End of book?';
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          },
         });
-      }
+      },
     });
   }
 
   saveToDatabase() {
-    // For now, this is a placeholder. 
+    // For now, this is a placeholder.
     // You can later implement saving logic and integration with Vector DB
     this.statusMessage = 'Data ready to be saved / translated to Tamil!';
   }
@@ -146,7 +146,7 @@ export class ContextExtractor {
       slokaTransliteration: this.slokaTransliteration,
       wordToWordMeaning: this.wordToWordMeaning,
       translation: this.translation,
-      purport: this.purport
+      purport: this.purport,
     };
 
     this.adminService.translateContextToTamil(payload).subscribe({
@@ -157,7 +157,7 @@ export class ContextExtractor {
         this.tamilWordToWordMeaning = res.wordToWordMeaning || '';
         this.tamilTranslation = res.translation || '';
         this.tamilPurport = res.purport || '';
-        
+
         this.statusMessage = 'Context successfully translated to Tamil!';
         this.isTranslating = false;
         this.isError = false;
@@ -168,7 +168,7 @@ export class ContextExtractor {
         this.isError = true;
         this.isTranslating = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 }

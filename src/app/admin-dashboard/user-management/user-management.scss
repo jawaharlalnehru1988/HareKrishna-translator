@@ -1,0 +1,48 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+  }
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  &.approved {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+
+  &.pending {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+  }
+}
+
+.small-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}

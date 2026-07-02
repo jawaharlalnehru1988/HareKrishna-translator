@@ -9,18 +9,38 @@
     <div class="card glass-card">
       <h2><span class="icon">📤</span> Bulk Training (Excel Upload)</h2>
       <p class="subtitle">Upload your translations sheet to embed them into the Vector DB.</p>
-      
+
+      <div class="form-group">
+        <label for="uploadScriptureContext">Scripture Context</label>
+        <select id="uploadScriptureContext" [(ngModel)]="uploadScriptureContext">
+          <option value="GENERAL">General ISKCON Style</option>
+          <option value="BHAGAVAD_GITA">Bhagavad Gita</option>
+          <option value="SRIMAD_BHAGAVATAM">Srimad Bhagavatam</option>
+          <option value="RAMAYANA">Ramayana</option>
+          <option value="MAHABHARATA">Mahabharata</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="dataType">Data Type</label>
         <select id="dataType" [(ngModel)]="uploadType">
           <option value="SENTENCE">Sentence (A: English Sentence, B: Tamil Sentence)</option>
           <option value="WORD">Word (A: English Word, B: Tamil Word)</option>
-          <option value="TRANSLITERATION">Transliteration (A: English Translit., B: Tamil Translit.)</option>
+          <option value="TRANSLITERATION">
+            Transliteration (A: English Translit., B: Tamil Translit.)
+          </option>
+          <option value="PURPORT">Purport (A: English Purport, B: Tamil Purport)</option>
         </select>
       </div>
 
       <div class="file-drop-area" (click)="fileInput.click()">
-        <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx, .xls" hidden>
+        <input
+          type="file"
+          #fileInput
+          (change)="onFileSelected($event)"
+          accept=".xlsx, .xls"
+          hidden
+        />
         <div class="drop-text">
           {{ selectedFile ? selectedFile.name : 'Click to select Excel file' }}
         </div>
@@ -30,15 +50,35 @@
         {{ isUploading ? 'Uploading & Training...' : 'Start Training AI' }}
       </button>
 
-      <div class="message" [class.success]="uploadStatus === 'Success'" [class.error]="uploadStatus === 'Error'" *ngIf="uploadMessage">
-        {{ uploadMessage }}
-      </div>
+      @if (uploadMessage) {
+        <div
+          class="message"
+          [class.success]="uploadStatus === 'Success'"
+          [class.error]="uploadStatus === 'Error'"
+          [class.info]="uploadStatus === 'Info'"
+        >
+          {{ uploadMessage }}
+        </div>
+      }
     </div>
 
     <!-- Manual Feedback Card -->
     <div class="card glass-card">
       <h2><span class="icon">✍️</span> Manual Correction</h2>
-      <p class="subtitle">Instantly fix a hallucination. The AI will learn this pair immediately.</p>
+      <p class="subtitle">
+        Instantly fix a hallucination. The AI will learn this pair immediately.
+      </p>
+
+      <div class="form-group">
+        <label>Scripture Context</label>
+        <select [(ngModel)]="feedbackScriptureContext">
+          <option value="GENERAL">General ISKCON Style</option>
+          <option value="BHAGAVAD_GITA">Bhagavad Gita</option>
+          <option value="SRIMAD_BHAGAVATAM">Srimad Bhagavatam</option>
+          <option value="RAMAYANA">Ramayana</option>
+          <option value="MAHABHARATA">Mahabharata</option>
+        </select>
+      </div>
 
       <div class="form-group">
         <label>Feedback Type</label>
@@ -46,26 +86,43 @@
           <option value="SENTENCE">Sentence Correction</option>
           <option value="WORD">Vocabulary Correction</option>
           <option value="TRANSLITERATION">Transliteration Correction</option>
+          <option value="PURPORT">Purport Correction</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>English Text</label>
-        <textarea [(ngModel)]="feedbackEnglish" placeholder="Enter the exact English string..."></textarea>
+        <textarea
+          [(ngModel)]="feedbackEnglish"
+          placeholder="Enter the exact English string..."
+        ></textarea>
       </div>
 
       <div class="form-group">
         <label>Corrected Tamil Text</label>
-        <textarea [(ngModel)]="feedbackTamil" placeholder="Enter the strictly correct Tamil equivalent..."></textarea>
+        <textarea
+          [(ngModel)]="feedbackTamil"
+          placeholder="Enter the strictly correct Tamil equivalent..."
+        ></textarea>
       </div>
 
-      <button class="primary-btn" [disabled]="!feedbackEnglish || !feedbackTamil || isSubmittingFeedback" (click)="submitFeedback()">
+      <button
+        class="primary-btn"
+        [disabled]="!feedbackEnglish || !feedbackTamil || isSubmittingFeedback"
+        (click)="submitFeedback()"
+      >
         {{ isSubmittingFeedback ? 'Saving...' : 'Submit Correction' }}
       </button>
 
-      <div class="message" [class.success]="feedbackStatus === 'Success'" [class.error]="feedbackStatus === 'Error'" *ngIf="feedbackMessage">
-        {{ feedbackMessage }}
-      </div>
+      @if (feedbackMessage) {
+        <div
+          class="message"
+          [class.success]="feedbackStatus === 'Success'"
+          [class.error]="feedbackStatus === 'Error'"
+        >
+          {{ feedbackMessage }}
+        </div>
+      }
     </div>
   </div>
 </div>

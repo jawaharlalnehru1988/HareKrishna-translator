@@ -2,60 +2,95 @@
   <div class="top-bar">
     <div class="nav-controls">
       <select [(ngModel)]="selectedCanto" (change)="onCantoChange()">
-        <option *ngFor="let c of toc" [ngValue]="c">{{ language === 'tamil' ? c.cantoNameTa : c.cantoName }} (Canto {{ c.cantoNumber }})</option>
+        @for (c of toc; track c) {
+          <option [ngValue]="c">
+            {{ language === 'tamil' ? c.cantoNameTa : c.cantoName }} (Canto {{ c.cantoNumber }})
+          </option>
+        }
       </select>
 
       <span class="separator">/</span>
 
       <select [(ngModel)]="selectedChapter" (change)="onChapterChange()">
-        <option *ngFor="let ch of selectedCanto?.chapters" [ngValue]="ch">Chapter {{ ch.chapterNumber }}</option>
+        @for (ch of selectedCanto?.chapters; track ch) {
+          <option [ngValue]="ch">Chapter {{ ch.chapterNumber }}</option>
+        }
       </select>
 
       <span class="separator">/</span>
 
       <select [(ngModel)]="selectedVerse" (change)="onVerseChange()">
-        <option *ngFor="let v of selectedChapter?.verses" [value]="v">Verse {{ v }}</option>
+        @for (v of selectedChapter?.verses; track v) {
+          <option [value]="v">Verse {{ v }}</option>
+        }
       </select>
     </div>
 
     <div class="language-toggle">
-      <button class="toggle-btn" [class.active]="language === 'english'" (click)="toggleLanguage()">English</button>
-      <button class="toggle-btn" [class.active]="language === 'tamil'" (click)="toggleLanguage()">Tamil</button>
+      <button class="toggle-btn" [class.active]="language === 'english'" (click)="toggleLanguage()">
+        English
+      </button>
+      <button class="toggle-btn" [class.active]="language === 'tamil'" (click)="toggleLanguage()">
+        Tamil
+      </button>
     </div>
   </div>
 
   <div class="content-area">
-    <div *ngIf="loading" class="loading">Loading verse...</div>
-    <div *ngIf="error" class="error-message">{{ error }}</div>
+    @if (loading) {
+      <div class="loading">Loading verse...</div>
+    }
+    @if (error) {
+      <div class="error-message">{{ error }}</div>
+    }
 
-    <div *ngIf="!loading && currentSloka" class="sloka-card">
-      <div class="sloka-header">
-        <h2>{{ currentSloka.cantoName }} {{ currentSloka.chapterNumber }}.{{ currentSloka.verseNumber }}</h2>
+    @if (!loading && currentSloka) {
+      <div class="sloka-card">
+        <div class="sloka-header">
+          <h2>
+            {{ currentSloka.cantoName }} {{ currentSloka.chapterNumber }}.{{
+              currentSloka.verseNumber
+            }}
+          </h2>
+        </div>
+        <div class="sanskrit-section">
+          <p
+            class="sanskrit-text"
+            [innerHTML]="currentSloka.sanskritSloka?.replace('\n', '<br>')"
+          ></p>
+          <p
+            class="transliteration-text"
+            [innerHTML]="currentSloka.transliteration?.replace('\n', '<br>')"
+          ></p>
+        </div>
+        @if (currentSloka.wordToWordMeaning) {
+          <div class="meaning-section">
+            <h3 class="section-title">SYNONYMS</h3>
+            <p class="word-to-word">{{ currentSloka.wordToWordMeaning }}</p>
+          </div>
+        }
+        @if (currentSloka.translation) {
+          <div class="translation-section">
+            <h3 class="section-title">TRANSLATION</h3>
+            <p class="translation-text">{{ currentSloka.translation }}</p>
+          </div>
+        }
+        @if (currentSloka.purport) {
+          <div class="purport-section">
+            <h3 class="section-title">PURPORT</h3>
+            <div
+              class="purport-text"
+              [innerHTML]="currentSloka.purport?.replace('\n\n', '<br><br>')"
+            ></div>
+          </div>
+        }
       </div>
+    }
 
-      <div class="sanskrit-section">
-        <p class="sanskrit-text" [innerHTML]="currentSloka.sanskritSloka?.replace('\n', '<br>')"></p>
-        <p class="transliteration-text" [innerHTML]="currentSloka.transliteration?.replace('\n', '<br>')"></p>
+    @if (!loading && !currentSloka && toc.length === 0) {
+      <div class="empty-state">
+        <p>No Ramayana verses have been saved yet.</p>
       </div>
-
-      <div class="meaning-section" *ngIf="currentSloka.wordToWordMeaning">
-        <h3 class="section-title">SYNONYMS</h3>
-        <p class="word-to-word">{{ currentSloka.wordToWordMeaning }}</p>
-      </div>
-
-      <div class="translation-section" *ngIf="currentSloka.translation">
-        <h3 class="section-title">TRANSLATION</h3>
-        <p class="translation-text">{{ currentSloka.translation }}</p>
-      </div>
-
-      <div class="purport-section" *ngIf="currentSloka.purport">
-        <h3 class="section-title">PURPORT</h3>
-        <div class="purport-text" [innerHTML]="currentSloka.purport?.replace('\n\n', '<br><br>')"></div>
-      </div>
-    </div>
-    
-    <div *ngIf="!loading && !currentSloka && toc.length === 0" class="empty-state">
-      <p>No Ramayana verses have been saved yet.</p>
-    </div>
+    }
   </div>
 </div>

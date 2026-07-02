@@ -1,5 +1,12 @@
-import { Component, ChangeDetectorRef, OnInit, OnDestroy, signal, WritableSignal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  ChangeDetectorRef,
+  OnInit,
+  OnDestroy,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { MarkdownComponent } from 'ngx-markdown';
 import { EvaluationService, EvaluationResponse } from '../services/evaluation.service';
@@ -8,7 +15,7 @@ import { firstValueFrom, Subject } from 'rxjs';
 @Component({
   selector: 'app-translation-corrector',
   standalone: true,
-  imports: [CommonModule, FormsModule, MarkdownComponent],
+  imports: [FormsModule, MarkdownComponent],
   templateUrl: './translation-corrector.html',
   styleUrl: './translation-corrector.scss',
 })
@@ -20,12 +27,12 @@ export class TranslationCorrector implements OnInit, OnDestroy {
   isCopied = signal(false);
   errorMessage = signal('');
   readonly maxChars = 3000;
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private evaluationService: EvaluationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -42,9 +49,11 @@ export class TranslationCorrector implements OnInit, OnDestroy {
     const tamil = this.tamilTranslation().trim();
 
     if (!english || !tamil) return;
-    
+
     if (english.length > this.maxChars || tamil.length > this.maxChars) {
-      this.errorMessage.set(`Input is too long. Please limit both texts to ${this.maxChars} characters for a precise evaluation.`);
+      this.errorMessage.set(
+        `Input is too long. Please limit both texts to ${this.maxChars} characters for a precise evaluation.`,
+      );
       return;
     }
 
@@ -52,13 +61,15 @@ export class TranslationCorrector implements OnInit, OnDestroy {
     this.errorMessage.set('');
     this.evaluationResult.set(null);
     this.cdr.detectChanges();
-    
+
     console.log('--- Evaluation Started (Signals/Async) ---');
     try {
-      const response = await firstValueFrom(this.evaluationService.evaluate({
-        englishText: english,
-        tamilTranslation: tamil
-      }));
+      const response = await firstValueFrom(
+        this.evaluationService.evaluate({
+          englishText: english,
+          tamilTranslation: tamil,
+        }),
+      );
 
       if (response) {
         console.log('Successfully captured evaluation response:', response);
@@ -79,7 +90,7 @@ export class TranslationCorrector implements OnInit, OnDestroy {
   onCopyImproved() {
     const improved = this.evaluationResult()?.improvedTranslation;
     if (!improved) return;
-    
+
     navigator.clipboard.writeText(improved).then(() => {
       this.isCopied.set(true);
       setTimeout(() => this.isCopied.set(false), 2000);

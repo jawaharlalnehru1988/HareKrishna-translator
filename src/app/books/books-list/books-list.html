@@ -1,0 +1,18 @@
+<div class="books-container">
+  <header class="page-header">
+    <h1 class="title">Spiritual Library</h1>
+    <p class="subtitle">Access all your translated scriptures and slokas organized by book.</p>
+  </header>
+
+  <div class="books-grid">
+    <div *ngFor="let book of books" class="book-card glass-card animate-fade-in" [routerLink]="['/books', book.title | lowercase, book.language]">
+      <div class="book-cover">
+        <span class="om-symbol">ॐ</span>
+      </div>
+      <div class="book-info">
+        <h3>{{ book.titleDisplay }}</h3>
+        <p>Click to read translated slokas</p>
+      </div>
+    </div>
+  </div>
+</div>
