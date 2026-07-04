@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
@@ -10,7 +10,7 @@ import { AdminService } from '../../services/admin.service';
   templateUrl: './ramayana-extractor.html',
   styleUrls: ['./ramayana-extractor.scss']
 })
-export class RamayanaExtractorComponent {
+export class RamayanaExtractorComponent implements OnInit {
   rawWisdomlibText: string = '';
   
   // Extracted fields
@@ -50,10 +50,87 @@ export class RamayanaExtractorComponent {
   isError: boolean = false;
   statusMessage: string = '';
 
+  searchTimeout: any = null;
+
   constructor(
     private adminService: AdminService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.fetchSloka();
+  }
+
+  onLocationChange() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    this.searchTimeout = setTimeout(() => {
+      this.fetchSloka();
+    }, 300);
+  }
+
+  fetchSloka() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    if (!this.cantoNumber || !this.chapterNumber || !this.verseNumber) {
+      return;
+    }
+
+    this.adminService.getRamayanaSloka(this.cantoNumber, this.chapterNumber, this.verseNumber).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.cantoName = res.cantoName || this.cantoName;
+          this.tamilCantoName = res.cantoNameTa || this.tamilCantoName;
+          this.sanskritSloka = res.sanskritSloka || '';
+          this.slokaTransliteration = res.transliterationEn || '';
+          this.wordToWordMeaning = res.wordToWordMeaningEn || '';
+          this.translation = res.translationEn || '';
+          this.purport = res.purportEn || '';
+          this.generatePurport = !!res.purportEn;
+          
+          this.tamilSanskritSloka = res.sanskritSloka || '';
+          this.tamilSlokaTransliteration = res.transliterationTa || '';
+          this.tamilWordToWordMeaning = res.wordToWordMeaningTa || '';
+          this.tamilTranslation = res.translationTa || '';
+          this.tamilPurport = res.purportTa || '';
+
+          this.statusMessage = 'Found existing verse content in database.';
+          this.isError = false;
+        } else {
+          this.clearFieldsExceptLocation();
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        if (err.status === 404) {
+          this.clearFieldsExceptLocation();
+          this.statusMessage = 'Verse not found in database. Ready for new input.';
+          this.isError = false;
+        } else {
+          this.statusMessage = 'Error checking database: ' + (err.error?.error || err.message);
+          this.isError = true;
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  clearFieldsExceptLocation() {
+    this.rawWisdomlibText = '';
+    this.sanskritSloka = '';
+    this.slokaTransliteration = '';
+    this.wordToWordMeaning = '';
+    this.translation = '';
+    this.purport = '';
+    this.tamilSanskritSloka = '';
+    this.tamilSlokaTransliteration = '';
+    this.tamilWordToWordMeaning = '';
+    this.tamilTranslation = '';
+    this.tamilPurport = '';
+  }
 
   extractFromRawText() {
     this.sanskritSloka = '';
@@ -137,7 +214,7 @@ export class RamayanaExtractorComponent {
       slokaTransliteration: this.slokaTransliteration,
       wordToWordMeaning: this.wordToWordMeaning,
       translation: this.translation,
-      purport: this.purport
+      purport: this.generatePurport ? this.purport : ''
     };
 
     this.adminService.translateContextToTamil(payload).subscribe({
@@ -147,7 +224,7 @@ export class RamayanaExtractorComponent {
         this.tamilSlokaTransliteration = res.slokaTransliteration || '';
         this.tamilWordToWordMeaning = res.wordToWordMeaning || '';
         this.tamilTranslation = res.translation || '';
-        this.tamilPurport = res.purport || '';
+        this.tamilPurport = this.generatePurport ? (res.purport || '') : '';
         
         this.statusMessage = 'Tamil Translation completed successfully.';
         this.isTranslatingTamil = false;
@@ -180,12 +257,12 @@ export class RamayanaExtractorComponent {
       transliterationEn: this.slokaTransliteration,
       wordToWordMeaningEn: this.wordToWordMeaning,
       translationEn: this.translation,
-      purportEn: this.purport,
+      purportEn: this.generatePurport ? this.purport : '',
       
       transliterationTa: this.tamilSlokaTransliteration,
       wordToWordMeaningTa: this.tamilWordToWordMeaning,
       translationTa: this.tamilTranslation,
-      purportTa: this.tamilPurport,
+      purportTa: this.generatePurport ? this.tamilPurport : '',
 
       override: override
     };
@@ -194,6 +271,11 @@ export class RamayanaExtractorComponent {
       next: (res: any) => {
         this.statusMessage = 'Successfully saved Ramayana verse to database!';
         this.isError = false;
+
+        // Go to next empty form with verse number increased
+        this.verseNumber++;
+        this.fetchSloka();
+
         this.cdr.detectChanges();
       },
       error: (err: any) => {

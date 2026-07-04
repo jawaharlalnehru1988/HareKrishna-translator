@@ -108,4 +108,22 @@ export class RamayanaReaderComponent implements OnInit {
         },
       });
   }
+
+  formatSanskrit(text: string): string {
+    if (!text) return '';
+    let result = text;
+    result = result.replace(/॥/g, '@@DOUBLE_DANDA@@');
+    result = result.replace(/।\s*/g, '।\n');
+    result = result.replace(/@@DOUBLE_DANDA@@/g, '॥');
+    return result;
+  }
+
+  formatTransliteration(text: string): string {
+    if (!text) return '';
+    let result = text;
+    result = result.replace(/\|\|/g, '@@DOUBLE_PIPE@@');
+    result = result.replace(/\|\s*/g, '|\n');
+    result = result.replace(/@@DOUBLE_PIPE@@/g, '||');
+    return result;
+  }
 }

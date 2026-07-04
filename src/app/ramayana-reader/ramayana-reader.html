@@ -54,14 +54,8 @@
           </h2>
         </div>
         <div class="sanskrit-section">
-          <p
-            class="sanskrit-text"
-            [innerHTML]="currentSloka.sanskritSloka?.replace('\n', '<br>')"
-          ></p>
-          <p
-            class="transliteration-text"
-            [innerHTML]="currentSloka.transliteration?.replace('\n', '<br>')"
-          ></p>
+          <p class="sanskrit-text">{{ formatSanskrit(currentSloka.sanskritSloka) }}</p>
+          <p class="transliteration-text">{{ formatTransliteration(currentSloka.transliteration) }}</p>
         </div>
         @if (currentSloka.wordToWordMeaning) {
           <div class="meaning-section">

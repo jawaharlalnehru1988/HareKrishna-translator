@@ -153,6 +153,11 @@
         &.sanskrit-text {
           font-family: serif;
           font-size: 1.1rem;
+          white-space: pre-wrap;
+        }
+
+        &.transliteration-text {
+          white-space: pre-wrap;
         }
       }
     }

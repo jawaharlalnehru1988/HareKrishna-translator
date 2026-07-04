@@ -27,15 +27,15 @@
         </div>
         <div class="form-group" style="flex: 1">
           <label>Canto No.</label>
-          <input type="number" [(ngModel)]="cantoNumber" />
+          <input type="number" [(ngModel)]="cantoNumber" (ngModelChange)="onLocationChange()" />
         </div>
         <div class="form-group" style="flex: 1">
           <label>Chapter No.</label>
-          <input type="number" [(ngModel)]="chapterNumber" />
+          <input type="number" [(ngModel)]="chapterNumber" (ngModelChange)="onLocationChange()" />
         </div>
         <div class="form-group" style="flex: 1">
           <label>Verse No.</label>
-          <input type="number" [(ngModel)]="verseNumber" />
+          <input type="number" [(ngModel)]="verseNumber" (ngModelChange)="onLocationChange()" />
         </div>
       </div>
 
