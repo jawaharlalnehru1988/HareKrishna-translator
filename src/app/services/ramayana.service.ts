@@ -18,4 +18,8 @@ export class RamayanaService {
   getSloka(language: string, canto: number, chapter: number, verse: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/${language}/${canto}/${chapter}/${verse}`);
   }
+
+  getChapterSlokas(language: string, canto: number, chapter: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${language}/${canto}/${chapter}`);
+  }
 }

@@ -1,90 +1,332 @@
-<div class="reader-container">
-  <div class="top-bar">
-    <div class="nav-controls">
-      <select [(ngModel)]="selectedCanto" (change)="onCantoChange()">
-        @for (c of toc; track c) {
-          <option [ngValue]="c">
-            {{ language === 'tamil' ? c.cantoNameTa : c.cantoName }} (Canto {{ c.cantoNumber }})
-          </option>
+<div class="vedabase-reader-wrapper" [ngClass]="['theme-' + theme]" [style.--reader-font-size.px]="fontSize">
+  
+  <!-- Reader Top Toolbar (Sticky) -->
+  <header class="reader-toolbar">
+    <div class="toolbar-left">
+      <!-- Breadcrumb Navigation -->
+      <div class="breadcrumb-selector">
+        <span class="book-title">📜 Rāmāyaṇa</span>
+        <span class="divider">/</span>
+        
+        <!-- Canto / Kanda Selector -->
+        <select class="clean-select" [(ngModel)]="selectedCanto" (change)="onCantoChange()">
+          @for (c of toc; track c.cantoNumber) {
+            <option [ngValue]="c">
+              {{ language === 'tamil' ? c.cantoNameTa : c.cantoName }} (Canto {{ c.cantoNumber }})
+            </option>
+          }
+        </select>
+
+        <span class="divider">/</span>
+
+        <!-- Chapter / Sarga Selector -->
+        <select class="clean-select" [(ngModel)]="selectedChapter" (change)="onChapterChange()">
+          @for (ch of selectedCanto?.chapters; track ch.chapterNumber) {
+            <option [ngValue]="ch">Sarga {{ ch.chapterNumber }}</option>
+          }
+        </select>
+
+        @if (viewMode === 'single') {
+          <span class="divider">/</span>
+          <!-- Verse Selector -->
+          <select class="clean-select verse-select" [(ngModel)]="selectedVerse" (change)="onVerseChange()">
+            @for (v of selectedChapter?.verses; track v) {
+              <option [ngValue]="v">Text {{ v }}</option>
+            }
+          </select>
         }
-      </select>
+      </div>
+    </div>
 
-      <span class="separator">/</span>
+    <div class="toolbar-right">
+      <!-- View Mode Toggle -->
+      <div class="segmented-control mode-toggle">
+        <button 
+          type="button"
+          class="seg-btn" 
+          [class.active]="viewMode === 'single'" 
+          (click)="setViewMode('single')"
+          title="Single Verse View">
+          📖 Single Text
+        </button>
+        <button 
+          type="button"
+          class="seg-btn" 
+          [class.active]="viewMode === 'continuous'" 
+          (click)="setViewMode('continuous')"
+          title="Full Chapter Continuous View">
+          📜 Full Sarga
+        </button>
+      </div>
 
-      <select [(ngModel)]="selectedChapter" (change)="onChapterChange()">
-        @for (ch of selectedCanto?.chapters; track ch) {
-          <option [ngValue]="ch">Chapter {{ ch.chapterNumber }}</option>
-        }
-      </select>
+      <!-- Language Toggle -->
+      <div class="segmented-control lang-toggle">
+        <button 
+          type="button"
+          class="seg-btn" 
+          [class.active]="language === 'english'" 
+          (click)="toggleLanguage('english')">
+          English
+        </button>
+        <button 
+          type="button"
+          class="seg-btn" 
+          [class.active]="language === 'tamil'" 
+          (click)="toggleLanguage('tamil')">
+          தமிழ்
+        </button>
+      </div>
 
-      <span class="separator">/</span>
+      <!-- Reader Settings (Font & Theme) -->
+      <div class="settings-group">
+        <!-- Font Size Controls -->
+        <div class="font-controls" title="Adjust Font Size">
+          <button type="button" class="tool-btn" (click)="changeFontSize(-1)" [disabled]="fontSize <= 14">A-</button>
+          <span class="font-indicator">{{ fontSize }}px</span>
+          <button type="button" class="tool-btn" (click)="changeFontSize(1)" [disabled]="fontSize >= 24">A+</button>
+        </div>
 
-      <select [(ngModel)]="selectedVerse" (change)="onVerseChange()">
+        <!-- Theme Switcher -->
+        <div class="theme-switcher">
+          <button 
+            type="button"
+            class="theme-pill theme-light-btn" 
+            [class.active]="theme === 'light'" 
+            (click)="setTheme('light')" 
+            title="Light (Parchment)">
+            ☀️
+          </button>
+          <button 
+            type="button"
+            class="theme-pill theme-sepia-btn" 
+            [class.active]="theme === 'sepia'" 
+            (click)="setTheme('sepia')" 
+            title="Sepia (Classic Palm Leaf)">
+            📜
+          </button>
+          <button 
+            type="button"
+            class="theme-pill theme-dark-btn" 
+            [class.active]="theme === 'dark'" 
+            (click)="setTheme('dark')" 
+            title="Dark (Night Mode)">
+            🌙
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Verse Jump Quick Bar (Horizontal scrollable pills) -->
+  @if (selectedChapter?.verses?.length > 0) {
+    <nav class="verse-jump-bar">
+      <span class="jump-label">Sarga {{ selectedChapter?.chapterNumber }} Texts:</span>
+      <div class="jump-pills-container">
         @for (v of selectedChapter?.verses; track v) {
-          <option [value]="v">Verse {{ v }}</option>
+          <button 
+            type="button"
+            class="jump-pill" 
+            [class.active]="selectedVerse === v"
+            (click)="selectVerseDirectly(v)">
+            {{ v }}
+          </button>
         }
-      </select>
-    </div>
+      </div>
+    </nav>
+  }
 
-    <div class="language-toggle">
-      <button class="toggle-btn" [class.active]="language === 'english'" (click)="toggleLanguage()">
-        English
-      </button>
-      <button class="toggle-btn" [class.active]="language === 'tamil'" (click)="toggleLanguage()">
-        Tamil
-      </button>
-    </div>
-  </div>
-
-  <div class="content-area">
+  <!-- Main Reading View Container -->
+  <main class="reading-container">
     @if (loading) {
-      <div class="loading">Loading verse...</div>
+      <div class="reader-loading-state">
+        <div class="spinner"></div>
+        <p>Loading sacred text...</p>
+      </div>
     }
+
     @if (error) {
-      <div class="error-message">{{ error }}</div>
-    }
-
-    @if (!loading && currentSloka) {
-      <div class="sloka-card">
-        <div class="sloka-header">
-          <h2>
-            {{ currentSloka.cantoName }} {{ currentSloka.chapterNumber }}.{{
-              currentSloka.verseNumber
-            }}
-          </h2>
-        </div>
-        <div class="sanskrit-section">
-          <p class="sanskrit-text">{{ formatSanskrit(currentSloka.sanskritSloka) }}</p>
-          <p class="transliteration-text">{{ formatTransliteration(currentSloka.transliteration) }}</p>
-        </div>
-        @if (currentSloka.wordToWordMeaning) {
-          <div class="meaning-section">
-            <h3 class="section-title">SYNONYMS</h3>
-            <p class="word-to-word">{{ currentSloka.wordToWordMeaning }}</p>
-          </div>
-        }
-        @if (currentSloka.translation) {
-          <div class="translation-section">
-            <h3 class="section-title">TRANSLATION</h3>
-            <p class="translation-text">{{ currentSloka.translation }}</p>
-          </div>
-        }
-        @if (currentSloka.purport) {
-          <div class="purport-section">
-            <h3 class="section-title">PURPORT</h3>
-            <div
-              class="purport-text"
-              [innerHTML]="currentSloka.purport?.replace('\n\n', '<br><br>')"
-            ></div>
-          </div>
-        }
+      <div class="reader-error-state">
+        <p>{{ error }}</p>
       </div>
     }
 
-    @if (!loading && !currentSloka && toc.length === 0) {
-      <div class="empty-state">
-        <p>No Ramayana verses have been saved yet.</p>
+    <!-- ============================================== -->
+    <!-- MODE 1: SINGLE VERSE FOCUS (Classic Vedabase)  -->
+    <!-- ============================================== -->
+    @if (!loading && viewMode === 'single' && currentSloka) {
+      <article class="single-verse-article">
+        <!-- Text Header -->
+        <header class="verse-main-header">
+          <span class="scripture-badge">{{ currentSloka.cantoName }}</span>
+          <h1 class="verse-title">TEXT {{ currentSloka.chapterNumber }}.{{ currentSloka.verseNumber }}</h1>
+        </header>
+
+        <!-- Sanskrit Devanagari -->
+        @if (showSanskrit && currentSloka.sanskritSloka) {
+          <section class="devanagari-section">
+            <p class="devanagari-verse">{{ formatSanskrit(currentSloka.sanskritSloka) }}</p>
+          </section>
+        }
+
+        <!-- Transliteration -->
+        @if (showTransliteration && currentSloka.transliteration) {
+          <section class="transliteration-section">
+            <p class="transliteration-verse">{{ formatTransliteration(currentSloka.transliteration) }}</p>
+          </section>
+        }
+
+        <!-- Synonyms / Word-for-Word -->
+        @if (showSynonyms && currentSloka.wordToWordMeaning) {
+          <section class="synonyms-section">
+            <h2 class="section-heading">SYNONYMS</h2>
+            <div class="synonyms-body">
+              {{ currentSloka.wordToWordMeaning }}
+            </div>
+          </section>
+        }
+
+        <!-- Translation -->
+        @if (showTranslation && currentSloka.translation) {
+          <section class="translation-section">
+            <h2 class="section-heading">TRANSLATION</h2>
+            <div class="translation-body">
+              {{ currentSloka.translation }}
+            </div>
+          </section>
+        }
+
+        <!-- Purport -->
+        @if (showPurport && currentSloka.purport) {
+          <section class="purport-section">
+            <h2 class="section-heading">PURPORT</h2>
+            <div class="purport-body" [innerHTML]="currentSloka.purport.replace('\n\n', '<br><br>')"></div>
+          </section>
+        }
+
+        <!-- Single Verse Bottom Pagination Navigation -->
+        <footer class="single-verse-nav">
+          <button 
+            type="button"
+            class="nav-verse-btn prev-btn" 
+            [disabled]="!hasPreviousVerse()"
+            (click)="goToPreviousVerse()">
+            <span class="arrow">←</span>
+            <span class="btn-text">Previous Text</span>
+          </button>
+
+          <div class="current-indicator">
+            Text {{ currentSloka.chapterNumber }}.{{ currentSloka.verseNumber }}
+          </div>
+
+          <button 
+            type="button"
+            class="nav-verse-btn next-btn" 
+            [disabled]="!hasNextVerse()"
+            (click)="goToNextVerse()">
+            <span class="btn-text">Next Text</span>
+            <span class="arrow">→</span>
+          </button>
+        </footer>
+      </article>
+    }
+
+    <!-- ============================================== -->
+    <!-- MODE 2: CONTINUOUS CHAPTER / SARGA VIEW        -->
+    <!-- ============================================== -->
+    @if (!loading && viewMode === 'continuous' && chapterSlokas.length > 0) {
+      <div class="continuous-chapter-view">
+        <!-- Chapter Header Banner -->
+        <header class="chapter-main-header">
+          <span class="canto-subtitle">{{ selectedCanto?.cantoName }}</span>
+          <h1 class="chapter-title">SARGA {{ selectedChapter?.chapterNumber }}</h1>
+          <p class="chapter-verse-count">{{ chapterSlokas.length }} Texts in this Sarga</p>
+        </header>
+
+        <div class="slokas-stream">
+          @for (sloka of chapterSlokas; track sloka.verseNumber) {
+            <article class="continuous-sloka-item" [id]="'verse-' + sloka.verseNumber">
+              
+              <!-- Sloka Anchor Header -->
+              <div class="item-header">
+                <a class="item-anchor" (click)="selectVerseDirectly(sloka.verseNumber)">
+                  TEXT {{ sloka.chapterNumber }}.{{ sloka.verseNumber }}
+                </a>
+              </div>
+
+              <!-- Sanskrit Devanagari -->
+              @if (showSanskrit && sloka.sanskritSloka) {
+                <div class="devanagari-section">
+                  <p class="devanagari-verse">{{ formatSanskrit(sloka.sanskritSloka) }}</p>
+                </div>
+              }
+
+              <!-- Transliteration -->
+              @if (showTransliteration && sloka.transliteration) {
+                <div class="transliteration-section">
+                  <p class="transliteration-verse">{{ formatTransliteration(sloka.transliteration) }}</p>
+                </div>
+              }
+
+              <!-- Synonyms -->
+              @if (showSynonyms && sloka.wordToWordMeaning) {
+                <div class="synonyms-section compact">
+                  <h3 class="section-heading">SYNONYMS</h3>
+                  <p class="synonyms-body">{{ sloka.wordToWordMeaning }}</p>
+                </div>
+              }
+
+              <!-- Translation -->
+              @if (showTranslation && sloka.translation) {
+                <div class="translation-section">
+                  <h3 class="section-heading">TRANSLATION</h3>
+                  <p class="translation-body">{{ sloka.translation }}</p>
+                </div>
+              }
+
+              <!-- Purport -->
+              @if (showPurport && sloka.purport) {
+                <div class="purport-section">
+                  <h3 class="section-heading">PURPORT</h3>
+                  <div class="purport-body" [innerHTML]="sloka.purport.replace('\n\n', '<br><br>')"></div>
+                </div>
+              }
+
+              <!-- Elegant Classical Verse Divider -->
+              <div class="verse-ornament-divider">
+                <span class="ornament">❖</span>
+              </div>
+            </article>
+          }
+        </div>
+
+        <!-- Chapter Navigation Footer -->
+        <footer class="continuous-footer-nav">
+          <button 
+            type="button"
+            class="nav-verse-btn" 
+            [disabled]="!hasPreviousChapter()"
+            (click)="selectedVerse = 1; onChapterChange()">
+            ← Previous Sarga
+          </button>
+          
+          <button 
+            type="button"
+            class="nav-verse-btn" 
+            [disabled]="!hasNextChapter()"
+            (click)="selectedVerse = 1; onChapterChange()">
+            Next Sarga →
+          </button>
+        </footer>
       </div>
     }
-  </div>
+
+    <!-- Empty State -->
+    @if (!loading && !currentSloka && chapterSlokas.length === 0 && toc.length === 0) {
+      <div class="reader-empty-state">
+        <p class="empty-icon">📖</p>
+        <h2>No Ramayana Verses Available</h2>
+        <p>No verses have been published in the database yet.</p>
+      </div>
+    }
+  </main>
 </div>
